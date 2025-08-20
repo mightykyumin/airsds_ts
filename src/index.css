@@ -186,3 +186,6 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+body, html, #root {
+  font-family: "Gowun Dodum", sans-serif;
+}
