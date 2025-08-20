@@ -313,7 +313,10 @@ function LoginButton() {
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
           </div>
           <Button className="w-full">Sign in</Button>
-          <div className="text-center text-sm text-muted-foreground">Don’t have an account? <a className="underline underline-offset-4" href="#">Sign up</a></div>
+          <div className="text-center text-sm text-muted-foreground">Don’t have an account? 
+           <Link to="/signup" className="underline underline-offset-4">
+            Sign up
+          </Link></div>
         </div>
       </DialogContent>
     </Dialog>
