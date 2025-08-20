@@ -86,7 +86,7 @@ function DateRangePicker({
 
 function ListingCard({ item }: { item: Listing }) {
   return (
-    <Card className="w-[280px] shrink-0">
+    <Card className="w-[280px] shrink-0 p-0">
       <CardHeader className="p-0">
         <div className="h-40 w-full overflow-hidden rounded-t-xl">
           <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
