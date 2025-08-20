@@ -1,5 +1,3 @@
-// src/mock/listings.ts
-
 export type Listing = {
   id: number
   name: string
@@ -13,9 +11,7 @@ export type RegionData = {
   listings: Listing[]
 }
 
-// ⬇️ 여기의 [...] 자리에, 현재 App.tsx에 있는 MOCK 배열 내용을
-//     그대로 통째로 붙여 넣으세요 (긴 base64 문자열 포함)
-//     예: const MOCK: RegionData[] = [ { region: "Seoul", listings: [...] }, ... ];
+
 const MOCK: RegionData[] = [
   {
     region: "Seoul",
