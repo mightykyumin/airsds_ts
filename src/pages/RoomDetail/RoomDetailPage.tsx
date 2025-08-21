@@ -255,12 +255,18 @@ function GalleryModal({
         </div>
 
         {/* 메인 이미지 밑에 레일 형태로 나머지 이미지 보기 (갤러리 모달) */}
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        <div className="mt-3 -mx-4 flex overflow-x-auto gap-0">
           {images.map((src, i) => (
-            <button
+            <div
               key={i}
+              role="button"
               onClick={() => setIndex(i)}
-              className="relative h-20 w-28 flex-shrink-0 rounded overflow-hidden p-0 border-0 ring-0 outline-none shadow-none bg-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
+              className="h-20 w-28 flex-shrink-0 overflow-hidden rounded-none m-0 p-0 cursor-pointer"
+              style={{
+                background: "transparent",
+                border: "none",
+                boxShadow: "none",
+              }}
               aria-label={`썸네일 ${i + 1}`}
             >
               <img
@@ -271,9 +277,10 @@ function GalleryModal({
                   i === index ? "opacity-100" : "opacity-80 hover:opacity-100"
                 }`}
               />
-            </button>
+            </div>
           ))}
         </div>
+
       </div>
     </div>
   );
