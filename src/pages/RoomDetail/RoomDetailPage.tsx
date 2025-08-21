@@ -5,8 +5,10 @@ import type { DateRange } from "react-day-picker";
 import MOCK from "@/mock/listings";
 
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { DateRangePicker } from "@/components/DateRangePicker/DateRangePicker";
+
+
 
 /* calender size 조정용 */
 function useMedia(query: string) {
@@ -47,9 +49,8 @@ export default function RoomDetailPage() {
     [roomId]
   );
 
-  // ✅ date range 상태 (체크인/체크아웃)
-  const [range, setRange] = useState<DateRange | undefined>();
-  const [calendarOpen, setCalendarOpen] = useState(false);
+  // 체크인-체크아웃 날짜 range 선택
+  const [range, setRange] = useState<DateRange | undefined>(undefined);
 
   // 모자이크/모달에서 쓸 이미지 5칸 확보
   const images = useMemo(() => {
@@ -63,18 +64,10 @@ export default function RoomDetailPage() {
   }, [room]);
 
   const nights = useMemo(() => {
-    if (!range?.from || !range.to) return 0;
-    const a = new Date(
-      range.from.getFullYear(),
-      range.from.getMonth(),
-      range.from.getDate()
-    ).getTime();
-    const b = new Date(
-      range.to.getFullYear(),
-      range.to.getMonth(),
-      range.to.getDate()
-    ).getTime();
-    return Math.max(0, Math.round((b - a) / (1000 * 60 * 60 * 24)));
+    if (!range?.from || !range?.to) return 0;
+    return Math.round(
+      (range.to.getTime() - range.from.getTime()) / (1000 * 60 * 60 * 24)
+    );
   }, [range]);
 
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -123,7 +116,7 @@ export default function RoomDetailPage() {
             </button>
           </div>
 
-          {/* 이미지 아래 텍스트 */}
+          {/* 숙소 설명 */}
           <div className="mt-6">
             <div className="text-gray-600">{room.location}</div>
             <p className="mt-4 text-gray-700">
@@ -133,7 +126,7 @@ export default function RoomDetailPage() {
           </div>
         </section>
 
-        {/* 우측: 예약 카드 */}
+        {/* 우측: 예약창 */}
         <aside className="lg:col-span-4">
           <div className="sticky top-24 rounded-2xl border p-5 shadow-sm bg-white">
             <div className="flex items-end justify-between">
@@ -147,53 +140,13 @@ export default function RoomDetailPage() {
                 </div>
               )}
             </div>
-
-            {/* ✅ 캘린더(popup) – 범위 선택 (컴팩트 & 반응형) */}
+            {/* DateRangePicker 컴포넌트 끌어와서 사용 */}
             <div className="mt-4">
-              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                <PopoverTrigger asChild>
-                  {/* Airbnb 형태: 두 칸짜리 트리거 */}
-                  <div
-                    className="grid grid-cols-2 rounded-xl border overflow-hidden cursor-pointer"
-                    role="button"
-                  >
-                    <div className="px-3 py-2">
-                      <div className="text-[11px] text-gray-600">체크인</div>
-                      <div className="text-sm">{formatKorean(range?.from)}</div>
-                    </div>
-                    <div className="px-3 py-2 border-l">
-                      <div className="text-[11px] text-gray-600">체크아웃</div>
-                      <div className="text-sm">{formatKorean(range?.to)}</div>
-                    </div>
-                  </div>
-                </PopoverTrigger>
-
-                {/* 팝오버 폭 & 셀 크기 축소 + 화면에 따라 1/2개월 표시 */}
-                <PopoverContent
-                  align="end"
-                  sideOffset={8}
-                  className="w-[320px] sm:w-[360px] p-2"
-                >
-                  <Calendar
-                    mode="range"
-                    captionLayout="label"
-                    showOutsideDays={false}
-                    className="[--cell-size:2.25rem] sm:[--cell-size:2.5rem] p-2"
-                    numberOfMonths={
-                      typeof window !== "undefined" &&
-                      window.matchMedia("(min-width: 1024px)").matches
-                        ? 2
-                        : 1
-                    }
-                    selected={range}
-                    onSelect={(r) => {
-                      setRange(r);
-                      // 양쪽 다 선택되면 자동 닫기
-                      if (r?.from && r?.to) setCalendarOpen(false);
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
+              <DateRangePicker
+                value={range}
+                onChange={setRange}
+                className="w-full"
+              />
             </div>
 
 
@@ -301,7 +254,7 @@ function GalleryModal({
           </button>
         </div>
 
-        {/* 썸네일 (테두리/그림자 제거) */}
+        {/* 메인 이미지 밑에 레일 형태로 나머지 이미지 보기 (갤러리 모달) */}
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {images.map((src, i) => (
             <button
