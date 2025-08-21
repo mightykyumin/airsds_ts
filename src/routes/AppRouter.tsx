@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "../App";
 import RoomDetailPage from "../pages/RoomDetail/RoomDetailPage.tsx";
-import SignUpPage from "../pages/signuppage.tsx";
+import SignUpPage from "../pages/SignUpPage.tsx";
 
 export default function AppRouter() {
   return (

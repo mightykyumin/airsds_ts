@@ -218,10 +218,14 @@ function RegionRow({ data }: { data: RegionData }) {
         <h3 className="text-xl font-semibold">{data.region}</h3>
       </div>
       <ScrollArea className="w-full">
-        <div className="flex gap-4 pb-4">
-          {data.listings.map((l) => (
-            <ListingCard key={l.id} item={l} />
-          ))}
+        <div className="flex gap-4 pb-4 min-w-[600px]">
+          {data.listings.length > 0 ? (
+            data.listings.map((l) => <ListingCard key={l.id} item={l} />)
+          ) : (
+            <div className="flex items-center justify-center text-muted-foreground w-full">
+              No results
+            </div>
+          )}
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
@@ -354,7 +358,7 @@ export default function App() {
           <p className="text-muted-foreground text-sm">Pick your dates and browse by region</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-w-[1180px]">
           <div className="lg:col-span-6">
             <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search destination, stay name..." />
           </div>
