@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import React, { useMemo, useState } from "react";
 import MOCK from "@/mock/listings";
+import ImageMosaic from "@/components/ui/image-mosaic";
 
 export default function RoomDetailPage() {
   const { roomId } = useParams();
