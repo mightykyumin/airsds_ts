@@ -1,9 +1,38 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Share2, Heart, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { MOCK } from "@/data/MOCK";
+import type { DateRange } from "react-day-picker";
+
+import { Button } from "@/components/ui/button";
+import { DateRangePicker } from "@/components/DateRangePicker/DateRangePicker";
+
+/* calender size 조정용 */
+function useMedia(query: string) {
+  const [matches, setMatches] = React.useState(false);
+  React.useEffect(() => {
+    const m = window.matchMedia(query);
+    const onChange = () => setMatches(m.matches);
+    onChange();
+    m.addEventListener("change", onChange);
+    return () => m.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
 
 
+/* -------------------- 유틸 -------------------- */
+function formatKorean(date?: Date) {
+  if (!date) return "날짜 선택";
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  return `${y}. ${m}. ${d}.`;
+}
+
+/* ===========================================================
+   RoomDetailPage
+=========================================================== */
 export default function RoomDetailPage() {
   const { roomId } = useParams();
   const navigate = useNavigate();
@@ -17,8 +46,8 @@ export default function RoomDetailPage() {
     [roomId]
   );
 
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  // 체크인-체크아웃 날짜 range 선택
+  const [range, setRange] = useState<DateRange | undefined>(undefined);
 
   // 모자이크/모달에서 쓸 이미지 5칸 확보
   const images = useMemo(() => {
@@ -32,12 +61,11 @@ export default function RoomDetailPage() {
   }, [room]);
 
   const nights = useMemo(() => {
-    if (!checkIn || !checkOut) return 0;
-    const a = new Date(checkIn).getTime();
-    const b = new Date(checkOut).getTime();
-    if (Number.isNaN(a) || Number.isNaN(b) || b <= a) return 0;
-    return Math.round((b - a) / (1000 * 60 * 60 * 24));
-  }, [checkIn, checkOut]);
+    if (!range?.from || !range?.to) return 0;
+    return Math.round(
+      (range.to.getTime() - range.from.getTime()) / (1000 * 60 * 60 * 24)
+    );
+  }, [range]);
 
   const [galleryOpen, setGalleryOpen] = useState(false);
 
@@ -49,8 +77,7 @@ export default function RoomDetailPage() {
       {/* 헤더 */}
       <header className="flex items-center justify-between gap-4 mb-4">
         <h1 className="text-2xl md:text-3xl font-bold">{room.name}</h1>
-        <div className="flex items-center gap-2">
-        </div>
+        <div className="flex items-center gap-2" />
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -86,7 +113,7 @@ export default function RoomDetailPage() {
             </button>
           </div>
 
-          {/* 이미지 아래 텍스트 */}
+          {/* 숙소 설명 */}
           <div className="mt-6">
             <div className="text-gray-600">{room.location}</div>
             <p className="mt-4 text-gray-700">
@@ -96,12 +123,13 @@ export default function RoomDetailPage() {
           </div>
         </section>
 
-        {/* 우측: 예약 카드 */}
+        {/* 우측: 예약창 */}
         <aside className="lg:col-span-4">
           <div className="sticky top-24 rounded-2xl border p-5 shadow-sm bg-white">
             <div className="flex items-end justify-between">
               <div className="text-2xl font-semibold">
-                ₩{room.price.toLocaleString()} <span className="text-base font-normal">/박</span>
+                ₩{room.price.toLocaleString()}{" "}
+                <span className="text-base font-normal">/박</span>
               </div>
               {nights > 0 && (
                 <div className="text-sm text-gray-600">
@@ -109,38 +137,28 @@ export default function RoomDetailPage() {
                 </div>
               )}
             </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <label className="block">
-                <span className="text-xs text-gray-600">체크인</span>
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                />
-              </label>
-              <label className="block">
-                <span className="text-xs text-gray-600">체크아웃</span>
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                />
-              </label>
+            {/* DateRangePicker 컴포넌트 끌어와서 사용 */}
+            <div className="mt-4">
+              <DateRangePicker
+                value={range}
+                onChange={setRange}
+                className="w-full"
+              />
             </div>
 
-            <button
+
+            <Button
               className="mt-4 w-full bg-primary text-black px-6 py-3 rounded-xl hover:bg-primary/90"
               onClick={() => {
-                if (!checkIn || !checkOut) return alert("체크인/체크아웃을 선택하세요.");
-                if (nights <= 0) return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
+                if (!range?.from || !range.to)
+                  return alert("체크인/체크아웃을 선택하세요.");
+                if (nights <= 0)
+                  return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
                 navigate(`/rooms/${room.id}/reserve-success`);
               }}
             >
               예약하기
-            </button>
+            </Button>
 
             <button
               className="mt-3 w-full px-6 py-3 rounded-xl text-blue-600 hover:underline"
@@ -154,10 +172,7 @@ export default function RoomDetailPage() {
 
       {/* 사진 갤러리 모달 */}
       {galleryOpen && (
-        <GalleryModal
-          images={images.filter(Boolean)}
-          onClose={() => setGalleryOpen(false)}
-        />
+        <GalleryModal images={images.filter(Boolean)} onClose={() => setGalleryOpen(false)} />
       )}
     </div>
   );
@@ -176,7 +191,6 @@ function GalleryModal({
   const [index, setIndex] = useState(initialIndex);
 
   useEffect(() => {
-    // ESC/좌우 화살표, 스크롤 잠금
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") setIndex((i) => (i + 1) % images.length);
@@ -209,11 +223,7 @@ function GalleryModal({
           <span className="text-sm">
             {index + 1} / {images.length}
           </span>
-          <button
-            className="p-2 rounded hover:bg-white/10"
-            onClick={onClose}
-            aria-label="닫기"
-          >
+          <button className="p-2 rounded hover:bg-white/10" onClick={onClose} aria-label="닫기">
             <X />
           </button>
         </div>
@@ -241,25 +251,30 @@ function GalleryModal({
           </button>
         </div>
 
-        {/* 썸네일 */}
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        {/* 메인 이미지 밑에 레일 형태로 나머지 이미지 보기 (갤러리 모달) */}
+        <div className="mt-3 -mx-4 flex overflow-x-auto gap-0">
           {images.map((src, i) => (
-            <button
+            <div
               key={i}
+              role="button"
               onClick={() => setIndex(i)}
-              className={`relative h-20 w-28 flex-shrink-0 rounded overflow-hidden
-                          p-0 border-0 ring-0 outline-none shadow-none bg-transparent
-                          focus:outline-none focus:ring-0 focus-visible:ring-0 appearance-none`}
+              className="h-20 w-28 flex-shrink-0 overflow-hidden rounded-none m-0 p-0 cursor-pointer"
+              style={{
+                background: "transparent",
+                border: "none",
+                boxShadow: "none",
+              }}
               aria-label={`썸네일 ${i + 1}`}
             >
               <img
                 src={src}
                 alt={`thumb-${i}`}
                 draggable={false}
-                className={`h-full w-full object-cover select-none
-                            ${i === index ? "opacity-100" : "opacity-80 hover:opacity-100"}`}
+                className={`h-full w-full object-cover select-none ${
+                  i === index ? "opacity-100" : "opacity-80 hover:opacity-100"
+                }`}
               />
-            </button>
+            </div>
           ))}
         </div>
 
