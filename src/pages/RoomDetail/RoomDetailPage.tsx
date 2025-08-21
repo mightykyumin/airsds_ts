@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Share2, Heart, ChevronLeft, ChevronRight, X } from "lucide-react";
-import MOCK from "@/mock/listings";
+import { MOCK } from "@/data/MOCK";
+
 
 export default function RoomDetailPage() {
   const { roomId } = useParams();

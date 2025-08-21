@@ -2,7 +2,7 @@ import './App.css'
 import './index.css'
 import "react-day-picker/dist/style.css"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Search } from "lucide-react"
 import type { DateRange } from "react-day-picker"
 
@@ -15,19 +15,49 @@ import { RegionRow } from "./components/Listing/RegionRow"
 import { HostingDialog } from './components/Hosting/HostingDialog'
 import { LoginDialog } from './components/Auth/LoginDialog'
 
+import { getRegionData } from './api/regionapi'
 import { MOCK } from "./data/MOCK"
+import axios from 'axios'
+import type { RegionData } from './data/types'
 
 export default function App() {
+  /////////////////////// Fetch Data //////////////////////
+  // Fetch Region Data
+  async function fetchRegionData() {
+    try {
+      const res = await axios.get('/ghouse')
+      console.log(res.data)
+      
+      setRegions(res.data.regions)
+    } catch (err) {
+      console.error('Failed to fetch region data', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    fetchRegionData()
+  }, [])
+
+  ////////////////////////
   const [query, setQuery] = useState("")
   const [range, setRange] = useState<DateRange | undefined>()
+  const [regions, setRegions] = useState<RegionData[]>([])
+  
+  const [loading, setLoading] = useState(true)
   const filtered = useMemo(() => {
-    if (!query.trim()) return MOCK
+    if (!query.trim()) return regions
     const q = query.toLowerCase()
-    return MOCK.map(r => ({
-      ...r,
-      listings: r.listings.filter(l => l.name.toLowerCase().includes(q) || l.location.toLowerCase().includes(q))
-    })).filter(r => r.listings.length > 0)
-  }, [query])
+    return regions
+      .map(r => ({
+        ...r,
+        listings: r.listings.filter(l =>
+          l.name.toLowerCase().includes(q) ||
+          l.location.toLowerCase().includes(q)
+        )
+      }))
+      .filter(r => r.listings.length > 0)
+  }, [query, regions])
 
   return (
     <div className="min-h-screen">
@@ -75,3 +105,6 @@ export default function App() {
     </div>
   )
 }
+
+ 
+
