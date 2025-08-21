@@ -19,3 +19,12 @@ export type RegionData = {
   region: string
   listings: Listing[]
 }
+
+export type HostingData = {
+  address: string
+  location: string
+  price: string
+  name: string
+  content: string
+  images: string[]
+}
