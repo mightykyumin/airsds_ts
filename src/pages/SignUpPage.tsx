@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 const passwordRule =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]).{8,16}$/
@@ -36,6 +37,7 @@ export default function SignUpPage() {
   const [showPw2, setShowPw2] = useState(false)
   const [sent, setSent] = useState(false)
   const [verified, setVerified] = useState(false)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -59,6 +61,7 @@ export default function SignUpPage() {
   const onSubmit = async (data: FormData) => {
     // TODO: 회원가입 API 연결
     console.log("sign up:", data)
+    navigate("/")
     alert("계정이 생성되었습니다! 🎉 (데모)")
   }
 
@@ -81,7 +84,7 @@ export default function SignUpPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           {/* 이메일 + 인증 전송 */}
-          <div className="grid grid-cols-[1fr_auto] gap-3">
+          <div className="grid grid-cols-[1fr_130px] gap-3">
             <div className="space-y-1">
               <Label htmlFor="email" className="sr-only">이메일</Label>
               <Input
@@ -100,7 +103,7 @@ export default function SignUpPage() {
           </div>
 
           {/* 인증번호 + 확인 */}
-          <div className="grid grid-cols-[1fr_auto] gap-3">
+          <div className="grid grid-cols-[1fr_130px] gap-3">
             <div className="space-y-1">
               <Label htmlFor="code" className="sr-only">인증번호</Label>
               <Input
