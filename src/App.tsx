@@ -15,6 +15,7 @@ import { format, isAfter, isBefore, isSameDay, startOfToday } from "date-fns"
 import type { DateRange, DayClickEventHandler } from "react-day-picker"
 import { Label } from "@/components/ui/label"
 import { DayPicker } from "react-day-picker"
+import ImageMosaic from "@/components/ui/image-mosaic"
 import "react-day-picker/dist/style.css"
 
 type Props = {
