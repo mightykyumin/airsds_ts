@@ -1,8 +1,39 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Share2, Heart, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import type { DateRange } from "react-day-picker";
 import MOCK from "@/mock/listings";
 
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+
+/* calender size 조정용 */
+function useMedia(query: string) {
+  const [matches, setMatches] = React.useState(false);
+  React.useEffect(() => {
+    const m = window.matchMedia(query);
+    const onChange = () => setMatches(m.matches);
+    onChange();
+    m.addEventListener("change", onChange);
+    return () => m.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
+
+
+/* -------------------- 유틸 -------------------- */
+function formatKorean(date?: Date) {
+  if (!date) return "날짜 선택";
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  return `${y}. ${m}. ${d}.`;
+}
+
+/* ===========================================================
+   RoomDetailPage
+=========================================================== */
 export default function RoomDetailPage() {
   const { roomId } = useParams();
   const navigate = useNavigate();
@@ -16,8 +47,9 @@ export default function RoomDetailPage() {
     [roomId]
   );
 
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  // ✅ date range 상태 (체크인/체크아웃)
+  const [range, setRange] = useState<DateRange | undefined>();
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   // 모자이크/모달에서 쓸 이미지 5칸 확보
   const images = useMemo(() => {
@@ -31,12 +63,19 @@ export default function RoomDetailPage() {
   }, [room]);
 
   const nights = useMemo(() => {
-    if (!checkIn || !checkOut) return 0;
-    const a = new Date(checkIn).getTime();
-    const b = new Date(checkOut).getTime();
-    if (Number.isNaN(a) || Number.isNaN(b) || b <= a) return 0;
-    return Math.round((b - a) / (1000 * 60 * 60 * 24));
-  }, [checkIn, checkOut]);
+    if (!range?.from || !range.to) return 0;
+    const a = new Date(
+      range.from.getFullYear(),
+      range.from.getMonth(),
+      range.from.getDate()
+    ).getTime();
+    const b = new Date(
+      range.to.getFullYear(),
+      range.to.getMonth(),
+      range.to.getDate()
+    ).getTime();
+    return Math.max(0, Math.round((b - a) / (1000 * 60 * 60 * 24)));
+  }, [range]);
 
   const [galleryOpen, setGalleryOpen] = useState(false);
 
@@ -48,8 +87,7 @@ export default function RoomDetailPage() {
       {/* 헤더 */}
       <header className="flex items-center justify-between gap-4 mb-4">
         <h1 className="text-2xl md:text-3xl font-bold">{room.name}</h1>
-        <div className="flex items-center gap-2">
-        </div>
+        <div className="flex items-center gap-2" />
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -100,7 +138,8 @@ export default function RoomDetailPage() {
           <div className="sticky top-24 rounded-2xl border p-5 shadow-sm bg-white">
             <div className="flex items-end justify-between">
               <div className="text-2xl font-semibold">
-                ₩{room.price.toLocaleString()} <span className="text-base font-normal">/박</span>
+                ₩{room.price.toLocaleString()}{" "}
+                <span className="text-base font-normal">/박</span>
               </div>
               {nights > 0 && (
                 <div className="text-sm text-gray-600">
@@ -109,37 +148,67 @@ export default function RoomDetailPage() {
               )}
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <label className="block">
-                <span className="text-xs text-gray-600">체크인</span>
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                />
-              </label>
-              <label className="block">
-                <span className="text-xs text-gray-600">체크아웃</span>
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                />
-              </label>
+            {/* ✅ 캘린더(popup) – 범위 선택 (컴팩트 & 반응형) */}
+            <div className="mt-4">
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  {/* Airbnb 형태: 두 칸짜리 트리거 */}
+                  <div
+                    className="grid grid-cols-2 rounded-xl border overflow-hidden cursor-pointer"
+                    role="button"
+                  >
+                    <div className="px-3 py-2">
+                      <div className="text-[11px] text-gray-600">체크인</div>
+                      <div className="text-sm">{formatKorean(range?.from)}</div>
+                    </div>
+                    <div className="px-3 py-2 border-l">
+                      <div className="text-[11px] text-gray-600">체크아웃</div>
+                      <div className="text-sm">{formatKorean(range?.to)}</div>
+                    </div>
+                  </div>
+                </PopoverTrigger>
+
+                {/* 팝오버 폭 & 셀 크기 축소 + 화면에 따라 1/2개월 표시 */}
+                <PopoverContent
+                  align="end"
+                  sideOffset={8}
+                  className="w-[320px] sm:w-[360px] p-2"
+                >
+                  <Calendar
+                    mode="range"
+                    captionLayout="label"
+                    showOutsideDays={false}
+                    className="[--cell-size:2.25rem] sm:[--cell-size:2.5rem] p-2"
+                    numberOfMonths={
+                      typeof window !== "undefined" &&
+                      window.matchMedia("(min-width: 1024px)").matches
+                        ? 2
+                        : 1
+                    }
+                    selected={range}
+                    onSelect={(r) => {
+                      setRange(r);
+                      // 양쪽 다 선택되면 자동 닫기
+                      if (r?.from && r?.to) setCalendarOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
-            <button
+
+            <Button
               className="mt-4 w-full bg-primary text-black px-6 py-3 rounded-xl hover:bg-primary/90"
               onClick={() => {
-                if (!checkIn || !checkOut) return alert("체크인/체크아웃을 선택하세요.");
-                if (nights <= 0) return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
+                if (!range?.from || !range.to)
+                  return alert("체크인/체크아웃을 선택하세요.");
+                if (nights <= 0)
+                  return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
                 navigate(`/rooms/${room.id}/reserve-success`);
               }}
             >
               예약하기
-            </button>
+            </Button>
 
             <button
               className="mt-3 w-full px-6 py-3 rounded-xl text-blue-600 hover:underline"
@@ -153,10 +222,7 @@ export default function RoomDetailPage() {
 
       {/* 사진 갤러리 모달 */}
       {galleryOpen && (
-        <GalleryModal
-          images={images.filter(Boolean)}
-          onClose={() => setGalleryOpen(false)}
-        />
+        <GalleryModal images={images.filter(Boolean)} onClose={() => setGalleryOpen(false)} />
       )}
     </div>
   );
@@ -175,7 +241,6 @@ function GalleryModal({
   const [index, setIndex] = useState(initialIndex);
 
   useEffect(() => {
-    // ESC/좌우 화살표, 스크롤 잠금
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") setIndex((i) => (i + 1) % images.length);
@@ -208,11 +273,7 @@ function GalleryModal({
           <span className="text-sm">
             {index + 1} / {images.length}
           </span>
-          <button
-            className="p-2 rounded hover:bg-white/10"
-            onClick={onClose}
-            aria-label="닫기"
-          >
+          <button className="p-2 rounded hover:bg-white/10" onClick={onClose} aria-label="닫기">
             <X />
           </button>
         </div>
@@ -240,28 +301,26 @@ function GalleryModal({
           </button>
         </div>
 
-        {/* 썸네일 */}
+        {/* 썸네일 (테두리/그림자 제거) */}
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {images.map((src, i) => (
             <button
               key={i}
               onClick={() => setIndex(i)}
-              className={`relative h-20 w-28 flex-shrink-0 rounded overflow-hidden
-                          p-0 border-0 ring-0 outline-none shadow-none bg-transparent
-                          focus:outline-none focus:ring-0 focus-visible:ring-0 appearance-none`}
+              className="relative h-20 w-28 flex-shrink-0 rounded overflow-hidden p-0 border-0 ring-0 outline-none shadow-none bg-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 appearance-none"
               aria-label={`썸네일 ${i + 1}`}
             >
               <img
                 src={src}
                 alt={`thumb-${i}`}
                 draggable={false}
-                className={`h-full w-full object-cover select-none
-                            ${i === index ? "opacity-100" : "opacity-80 hover:opacity-100"}`}
+                className={`h-full w-full object-cover select-none ${
+                  i === index ? "opacity-100" : "opacity-80 hover:opacity-100"
+                }`}
               />
             </button>
           ))}
         </div>
-
       </div>
     </div>
   );
