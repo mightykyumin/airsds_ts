@@ -16,7 +16,7 @@ import { HostingDialog } from './components/Hosting/HostingDialog'
 import { LoginDialog } from './components/Auth/LoginDialog'
 
 import { getRegionData } from './api/regionapi'
-import { MOCK } from "./data/MOCK"
+//import { MOCK } from "./data/MOCK"
 import axios from 'axios'
 import type { RegionData } from './data/types'
 
@@ -53,7 +53,8 @@ export default function App() {
         ...r,
         listings: r.listings.filter(l =>
           l.name.toLowerCase().includes(q) ||
-          l.location.toLowerCase().includes(q)
+          l.location.toLowerCase().includes(q) ||
+          l.address.toLowerCase().includes(q)
         )
       }))
       .filter(r => r.listings.length > 0)

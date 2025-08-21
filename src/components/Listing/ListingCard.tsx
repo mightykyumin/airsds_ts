@@ -15,7 +15,7 @@ export function ListingCard({ item }: { item: Listing }) {
         </CardHeader>
         <CardContent className="p-4 space-y-1">
           <CardTitle className="text-base">{item.name}</CardTitle>
-          <div className="text-sm text-muted-foreground">{item.location}</div>
+          <div className="text-sm text-muted-foreground">{item.address}</div>
           <div className="text-sm">₩{item.price.toLocaleString()}/night</div>
         </CardContent>
       </Card>

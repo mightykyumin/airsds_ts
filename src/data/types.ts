@@ -11,6 +11,7 @@ export type Listing = {
   id: number
   name: string
   location: string
+  address: string
   price: number
   image: string[]
 }
@@ -19,3 +20,5 @@ export type RegionData = {
   region: string
   listings: Listing[]
 }
+
+
