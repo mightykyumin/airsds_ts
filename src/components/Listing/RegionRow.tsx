@@ -1,5 +1,5 @@
 import { ListingCard } from "./ListingCard";
-import { ScrollArea, ScrollBar } from "../scroll-area";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 import type { RegionData } from "@/data/types";
 

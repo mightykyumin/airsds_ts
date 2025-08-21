@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 
-import { DateRangePicker } from "./components/ui/DateRangePicker/DateRangePicker"
-import { RegionRow } from "./components/ui/Listing/RegionRow"
-import { HostingDialog } from './components/ui/Hosting/HostingDialog'
-import { LoginDialog } from './components/ui/Auth/LoginDialog'
+import { DateRangePicker } from "./components/DateRangePicker/DateRangePicker"
+import { RegionRow } from "./components/Listing/RegionRow"
+import { HostingDialog } from './components/Hosting/HostingDialog'
+import { LoginDialog } from './components/Auth/LoginDialog'
 
 import { MOCK } from "./data/MOCK"
 
