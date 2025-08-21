@@ -49,14 +49,6 @@ export default function RoomDetailPage() {
       <header className="flex items-center justify-between gap-4 mb-4">
         <h1 className="text-2xl md:text-3xl font-bold">{room.name}</h1>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
-            <Share2 size={16} />
-            <span className="text-sm">공유하기</span>
-          </button>
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
-            <Heart size={16} />
-            <span className="text-sm">저장</span>
-          </button>
         </div>
       </header>
 
@@ -139,7 +131,7 @@ export default function RoomDetailPage() {
             </div>
 
             <button
-              className="mt-4 w-full bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary/90"
+              className="mt-4 w-full bg-primary text-black px-6 py-3 rounded-xl hover:bg-primary/90"
               onClick={() => {
                 if (!checkIn || !checkOut) return alert("체크인/체크아웃을 선택하세요.");
                 if (nights <= 0) return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
@@ -153,7 +145,7 @@ export default function RoomDetailPage() {
               className="mt-3 w-full px-6 py-3 rounded-xl text-blue-600 hover:underline"
               onClick={() => navigate(-1)}
             >
-              ← 뒤로가기
+              뒤로가기
             </button>
           </div>
         </aside>
@@ -254,15 +246,22 @@ function GalleryModal({
             <button
               key={i}
               onClick={() => setIndex(i)}
-              className={`relative h-20 w-28 flex-shrink-0 rounded overflow-hidden ring-2 ${
-                i === index ? "ring-white" : "ring-transparent"
-              }`}
+              className={`relative h-20 w-28 flex-shrink-0 rounded overflow-hidden
+                          p-0 border-0 ring-0 outline-none shadow-none bg-transparent
+                          focus:outline-none focus:ring-0 focus-visible:ring-0 appearance-none`}
               aria-label={`썸네일 ${i + 1}`}
             >
-              <img src={src} alt={`thumb-${i}`} className="h-full w-full object-cover" />
+              <img
+                src={src}
+                alt={`thumb-${i}`}
+                draggable={false}
+                className={`h-full w-full object-cover select-none
+                            ${i === index ? "opacity-100" : "opacity-80 hover:opacity-100"}`}
+              />
             </button>
           ))}
         </div>
+
       </div>
     </div>
   );
