@@ -22,10 +22,11 @@ export type RegionData = {
 }
 
 export type HostingData = {
+  userId: number
   address: string
   location: string
   price: string
-  name: string
+  title: string
   content: string
-  images: string[]
+  imageUrl: string[]
 }

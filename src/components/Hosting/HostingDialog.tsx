@@ -16,10 +16,11 @@ import {
 } from "@/components/ui/select"
 
 export function HostingDialog() {
+  const userId =  Number(sessionStorage.getItem("userId")) || 0
   const [ghouseAddress, setGhouseAddress] = useState("")
   const [ghouseLocation, setGhouseLocation] = useState("")
   const [ghousPrice, setGhousPrice] = useState("")
-  const [ghouseName, setGhouseName] = useState("")
+  const [ghouseTitle, setGhouseTitle] = useState("")
   const [ghouseContent, setGhouseContent] = useState("")
   const [ghouseImages, setGhouseImages] = useState<string[]>([""]) // 이미지 URL 배열
 
@@ -40,14 +41,21 @@ export function HostingDialog() {
   }
 
   const handleSubmit = async () => {
+    // 입력된 이미지들에서 공백 제거 + 빈 문자열 필터링
+    const cleanedImages = ghouseImages
+      .map((url) => url.trim())
+      .filter((url) => url.length > 0)
+
     const data: HostingData = {
+      userId,
       address: ghouseAddress,
       location: ghouseLocation,
       price: ghousPrice,
-      name: ghouseName,
+      title: ghouseTitle,
       content: ghouseContent,
-      images: ghouseImages
+      imageUrl: cleanedImages,
     }
+
 
     try {
       const res = await axios.post("http://192.168.50.128:8080/ghouse/upload", data)
@@ -77,11 +85,11 @@ export function HostingDialog() {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="ghouseAddress">Address</Label>
-            <Input id="ghouseAddress" value={ghouseAddress} onChange={(e) => setGhouseAddress(e.target.value)} placeholder="도로명 주소를 입력해주세요" />
+            <Label htmlFor="ghouseTitle">숙소이름</Label>
+            <Input id="ghouseTitle" value={ghouseTitle} onChange={(e) => setGhouseTitle(e.target.value)} placeholder="이름을 입력해주세요" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="ghouseLocation">Location</Label>
+            <Label htmlFor="ghouseLocation">숙소위치</Label>
             <Select value={ghouseLocation} onValueChange={(value) => setGhouseLocation(value)}>
               <SelectTrigger id="ghouseLocation" className="w-full">
                 <SelectValue placeholder="지역을 선택해주세요" />
@@ -92,23 +100,26 @@ export function HostingDialog() {
                 <SelectItem value="Jeju">제주</SelectItem>
               </SelectContent>
             </Select>
+
           </div>
           <div className="space-y-2">
-            <Label htmlFor="ghousPrice">Price</Label>
+            <Label htmlFor="ghouseAddress">숙소상세위치</Label>
+            <Input id="ghouseAddress" value={ghouseAddress} onChange={(e) => setGhouseAddress(e.target.value)} placeholder="도로명 주소를 입력해주세요" />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="ghousPrice">가격</Label>
             <Input id="ghousPrice" value={ghousPrice} onChange={(e) => setGhousPrice(e.target.value)} placeholder="하루 숙박 가격을 입력해주세요" />
           </div>
+          
           <div className="space-y-2">
-            <Label htmlFor="ghouseName">Name</Label>
-            <Input id="ghouseName" value={ghouseName} onChange={(e) => setGhouseName(e.target.value)} placeholder="이름을 입력해주세요" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="ghouseContent">Content</Label>
+            <Label htmlFor="ghouseContent">설명</Label>
             <Input id="ghouseContent" value={ghouseContent} onChange={(e) => setGhouseContent(e.target.value)} placeholder="설명을 입력해주세요" />
           </div>
 
           {/* 이미지 URL 입력 (동적 추가 가능) */}
           <div className="space-y-2">
-            <Label>Images (URL)</Label>
+            <Label>이미지</Label>
             {ghouseImages.map((url, index) => (
               <div key={index} className="flex gap-2">
                 <Input
