@@ -25,7 +25,7 @@ export type HostingData = {
   address: string
   location: string
   price: string
-  name: string
+  title: string
   content: string
   images: string[]
 }
