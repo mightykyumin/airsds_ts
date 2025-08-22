@@ -18,6 +18,10 @@ export default defineConfig({
         target: 'http://192.168.50.128:8080', // Spring Boot 서버 주소
         changeOrigin: true,
       },
+      '/ghouse/upload': {
+        target: 'http://192.168.50.128:8080', // Spring Boot 서버 주소
+        changeOrigin: true,
+      },
     },
   },
 })
