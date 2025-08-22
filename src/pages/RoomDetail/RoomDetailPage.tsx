@@ -1,11 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { MOCK } from "@/data/MOCK";
 import type { DateRange } from "react-day-picker";
+import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/DateRangePicker/DateRangePicker";
+import { endpointIp } from "@/data/Endpoint";
+import type {
+  RoomDetailResponse,
+  Ghouse,
+  Review,
+  GhouseImage,
+  BookingDay,
+} from "@/data/types";
 
 /* calender size 조정용 */
 function useMedia(query: string) {
@@ -20,7 +28,6 @@ function useMedia(query: string) {
   return matches;
 }
 
-
 /* -------------------- 유틸 -------------------- */
 function formatKorean(date?: Date) {
   if (!date) return "날짜 선택";
@@ -34,31 +41,54 @@ function formatKorean(date?: Date) {
    RoomDetailPage
 =========================================================== */
 export default function RoomDetailPage() {
-  const { roomId } = useParams();
+  const { roomId } = useParams<{ roomId: string }>(); // URL param (== ghouseId)
   const navigate = useNavigate();
 
-  // 기존 로직 그대로
-  const room = useMemo(
-    () =>
-      MOCK.flatMap((region) => region.listings).find(
-        (item) => String(item.id) === roomId
-      ),
-    [roomId]
-  );
+  // 상태
+  const [room, setRoom] = useState<Ghouse | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [images, setImages] = useState<GhouseImage[]>([]);
+  const [bookingDays, setBookingDays] = useState<BookingDay[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // 체크인-체크아웃 날짜 range 선택
   const [range, setRange] = useState<DateRange | undefined>(undefined);
 
-  // 모자이크/모달에서 쓸 이미지 5칸 확보
-  const images = useMemo(() => {
-    const arr = Array.isArray(room?.image)
-      ? (room!.image as string[])
-      : room?.image
-      ? [room.image as string]
-      : [];
+  // API 호출
+  useEffect(() => {
+  console.log("RoomDetail useEffect 실행됨, roomId:", roomId)
+  if (!roomId) return;
+
+  const fetchDetail = async () => {
+    try {
+      const res = await axios.get<RoomDetailResponse>(
+        `http://${endpointIp}:8080/ghouse/${roomId}`
+      );
+
+      console.log("ghouse 응답:", res.data);
+
+      setRoom(res.data.ghouse);
+      setReviews(res.data.reviews);
+      setImages(res.data.ghouseImages);
+      setBookingDays(res.data.bookingDays);
+    } catch (err) {
+      console.error("숙소 상세 조회 실패:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDetail();
+}, [roomId]);
+
+
+
+  // 이미지 5개 확보 (기존 로직 유지)
+  const imageUrls = useMemo(() => {
+    const arr = images.map((img) => img.imageUrl);
     const first = arr[0] ?? "";
     return [arr[0] ?? first, arr[1] ?? first, arr[2] ?? first, arr[3] ?? first, arr[4] ?? first];
-  }, [room]);
+  }, [images]);
 
   const nights = useMemo(() => {
     if (!range?.from || !range?.to) return 0;
@@ -69,6 +99,7 @@ export default function RoomDetailPage() {
 
   const [galleryOpen, setGalleryOpen] = useState(false);
 
+  if (loading) return <div className="p-6">불러오는 중...</div>;
   if (!roomId) return <div className="p-6">잘못된 접근입니다.</div>;
   if (!room) return <div className="p-6">존재하지 않는 숙소입니다.</div>;
 
@@ -76,7 +107,7 @@ export default function RoomDetailPage() {
     <div className="w-full max-w-7xl mx-auto p-6">
       {/* 헤더 */}
       <header className="flex items-center justify-between gap-4 mb-4">
-        <h1 className="text-2xl md:text-3xl font-bold">{room.name}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{room.title}</h1>
         <div className="flex items-center gap-2" />
       </header>
 
@@ -88,16 +119,16 @@ export default function RoomDetailPage() {
             <div className="h-[300px] md:h-[420px] lg:h-[560px] grid grid-cols-4 grid-rows-2 gap-2 md:gap-3 lg:gap-4">
               <div className="col-span-2 row-span-2">
                 <img
-                  src={images[0]}
-                  alt={`${room.name} 메인 이미지`}
+                  src={imageUrls[0]}
+                  alt={`${room.title} 메인 이미지`}
                   className="w-full h-full object-cover"
                 />
               </div>
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="col-span-1 row-span-1">
                   <img
-                    src={images[i]}
-                    alt={`${room.name} 썸네일 ${i}`}
+                    src={imageUrls[i]}
+                    alt={`${room.title} 썸네일 ${i}`}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -116,10 +147,23 @@ export default function RoomDetailPage() {
           {/* 숙소 설명 */}
           <div className="mt-6">
             <div className="text-gray-600">{room.location}</div>
-            <p className="mt-4 text-gray-700">
-              여기에 숙소에 대한 상세 설명을 추가할 수 있습니다. 편의시설, 주변 교통, 하우스
-              룰 등을 적어주세요.
-            </p>
+            <p className="mt-4 text-gray-700">{room.content}</p>
+          </div>
+
+          {/* 리뷰 */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold">리뷰</h2>
+            {reviews.length === 0 ? (
+              <p className="text-gray-500">아직 리뷰가 없습니다.</p>
+            ) : (
+              <ul className="mt-2 space-y-2">
+                {reviews.map((rev) => (
+                  <li key={rev.reviewId} className="border p-3 rounded-lg text-sm">
+                    ⭐ {rev.rating}점 · {rev.content}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
 
@@ -146,7 +190,6 @@ export default function RoomDetailPage() {
               />
             </div>
 
-
             <Button
               className="mt-4 w-full bg-primary text-black px-6 py-3 rounded-xl hover:bg-primary/90"
               onClick={() => {
@@ -154,7 +197,7 @@ export default function RoomDetailPage() {
                   return alert("체크인/체크아웃을 선택하세요.");
                 if (nights <= 0)
                   return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
-                navigate(`/rooms/${room.id}/reserve-success`);
+                navigate(`/rooms/${room.ghouseId}/reserve-success`);
               }}
             >
               예약하기
@@ -172,7 +215,7 @@ export default function RoomDetailPage() {
 
       {/* 사진 갤러리 모달 */}
       {galleryOpen && (
-        <GalleryModal images={images.filter(Boolean)} onClose={() => setGalleryOpen(false)} />
+        <GalleryModal images={imageUrls.filter(Boolean)} onClose={() => setGalleryOpen(false)} />
       )}
     </div>
   );
