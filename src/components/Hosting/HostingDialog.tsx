@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import type { HostingData } from "@/data/types"
 import axios from "axios"
+import { endpointIp } from "@/data/Endpoint"
 import {
   Select,
   SelectContent,
@@ -58,11 +59,12 @@ export function HostingDialog() {
 
 
     try {
-      const res = await  axios.post('/ghouse/upload')
-      console.log("서버 응답:", res.data)
+      const res = await axios.post('http://' + endpointIp   + ':8080/ghouse/upload',data)
+      console.log("서버 응답:", res.data.imageUrl)
       alert("숙소 등록 완료!")
       // 필요하면 여기서 상태 초기화 가능
       setOpen(false)
+      window.location.reload()
     } catch (err) {
       console.error("서버 요청 실패:", err)
       alert("숙소 등록 실패")

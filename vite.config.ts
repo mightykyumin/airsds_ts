@@ -11,17 +11,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  server: {
-    proxy: {
-      // 이 부분 추가!
-      '/ghouse': {
-        target: 'http://192.168.50.128:8080', // Spring Boot 서버 주소
-        changeOrigin: true,
-      },
-      '/ghouse/upload': {
-        target: 'http://192.168.50.128:8080', // Spring Boot 서버 주소
-        changeOrigin: true,
-      },
-    },
-  },
+  
 })

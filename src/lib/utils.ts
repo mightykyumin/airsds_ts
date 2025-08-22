@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { RegionData } from "@/data/types"
 import axios from 'axios'
+import { endpointIp } from "@/data/Endpoint"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -33,7 +34,7 @@ export async function fetchRegionData(
   setLoading: (loading: boolean) => void
 ) {
   try {
-    const res = await axios.get('/ghouse')
+    const res = await axios.get('http://' + endpointIp   + ':8080/ghouse')
     console.log(res.data)
     setRegions(res.data.regions)
   } catch (err) {

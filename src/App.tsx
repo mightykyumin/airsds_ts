@@ -17,7 +17,7 @@ import { LoginDialog } from './components/Auth/LoginDialog'
 import { filterByQuery } from "@/lib/utils"
 import { fetchRegionData } from '@/lib/utils'
 
-import { getRegionData } from './api/regionapi'
+
 //import { MOCK } from "./data/MOCK"
 import axios from 'axios'
 import type { RegionData } from './data/types'

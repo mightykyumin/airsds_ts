@@ -1,0 +1,1 @@
+export const endpointIp = "192.168.50.103"
