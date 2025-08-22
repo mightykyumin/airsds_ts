@@ -10,7 +10,7 @@ export function ListingCard({ item }: { item: Listing }) {
       <Card className="w-[280px] shrink-0 p-0">
         <CardHeader className="p-0">
           <div className="h-40 w-full overflow-hidden rounded-t-xl">
-            <img src={item.image[0]} alt={item.name} className="h-full w-full object-cover" />
+            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
           </div>
         </CardHeader>
         <CardContent className="p-4 space-y-1">

@@ -13,7 +13,7 @@ export type Listing = {
   location: string
   address: string
   price: number
-  image: string[]
+  image: string
 }
 
 export type RegionData = {
