@@ -1,14 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { MOCK } from "@/data/MOCK";
 import type { DateRange } from "react-day-picker";
-import MOCK from "@/mock/listings";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { DateRangePicker } from "@/components/DateRangePicker/DateRangePicker";
-
-
 
 /* calender size 조정용 */
 function useMedia(query: string) {

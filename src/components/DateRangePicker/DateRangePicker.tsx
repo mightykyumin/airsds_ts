@@ -12,7 +12,7 @@ import type { Props } from "@/data/types"
 export function DateRangePicker({
   value,
   onChange,
-  placeholder = "Check-in — Check-out",
+  placeholder = "체크인 날짜 — 체크아웃 날짜",
   className
 }: Props) {
   const [open, setOpen] = useState(false)

@@ -11,11 +11,22 @@ export type Listing = {
   id: number
   name: string
   location: string
+  address: string
   price: number
-  image: string[]
+  image: string
 }
 
 export type RegionData = {
   region: string
   listings: Listing[]
+}
+
+export type HostingData = {
+  userId: number
+  address: string
+  location: string
+  price: string
+  title: string
+  content: string
+  imageUrl: string[]
 }

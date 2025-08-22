@@ -9,29 +9,35 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { endpointIp } from "@/data/Endpoint"
+import axios from 'axios'
 
 const passwordRule =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]).{8,16}$/
 
 const schema = z.object({
-  email: z.string().email("올바른 이메일을 입력하세요."),
-  code: z.string().min(4, "인증번호 4자리 이상").max(8, "인증번호가 너무 깁니다."),
+  email: z.string().email("이메일이 존재하지 않습니다"),
+  code: z.string().min(4, "인증번호가 일치하지 않습니다").max(8, "인증번호가 일치하지 않습니다"),
   password: z
     .string()
-    .regex(passwordRule, "8~16자 영문 대/소문자, 숫자, 특수문자를 사용하세요."),
-  confirm: z.string(),
-  name: z.string().min(2, "이름은 2자 이상"),
-  phone: z
+    .regex(passwordRule, "8~16자 영문 대/소문자, 숫자, 특수문자를 사용하세요"),
+  confirmPassword: z.string(),
+  name: z.string().min(2, "이름은 최소 2자 이상 입력해주세요"),
+  phoneNumber: z
     .string()
-    .min(9, "전화번호를 입력하세요.")
-    .regex(/^[0-9\-+\s()]+$/, "숫자와 - 만 입력 가능"),
-}).refine(v => v.password === v.confirm, {
+    .min(9, "전화번호를 입력해주세요")
+    .regex(/^[0-9\-+\s()]+$/, "숫자와 - 만 입력 가능합니다"),
+}).refine(v => v.password === v.confirmPassword, {
   path: ["confirm"],
-  message: "비밀번호가 일치하지 않습니다.",
+  message: "비밀번호가 일치하지 않습니다",
 })
 
 type FormData = z.infer<typeof schema>
 
+export async function registerUser(data: FormData) {
+  const res = await axios.post('http://'+ endpointIp + ':8080/auth/signup', data)
+  return res.data
+}
 export default function SignUpPage() {
   const [showPw, setShowPw] = useState(false)
   const [showPw2, setShowPw2] = useState(false)
@@ -45,6 +51,8 @@ export default function SignUpPage() {
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) })
+
+  
 
   const onSendCode = async () => {
     setSent(true)
@@ -60,9 +68,15 @@ export default function SignUpPage() {
 
   const onSubmit = async (data: FormData) => {
     // TODO: 회원가입 API 연결
-    console.log("sign up:", data)
-    navigate("/")
-    alert("계정이 생성되었습니다! 🎉 (데모)")
+    try {
+      const res = await registerUser(data)
+      console.log('가입 완료', res)
+      alert("계정이 생성되었습니다! 🎉")
+      navigate("/")
+    } catch (err) {
+      console.error('회원가입 실패', err)
+      alert("회원가입에 실패했습니다.")
+    }
   }
 
   return (
@@ -156,7 +170,7 @@ export default function SignUpPage() {
                 id="confirm"
                 type={showPw2 ? "text" : "password"}
                 placeholder="비밀번호 재확인"
-                {...register("confirm")}
+                {...register("confirmPassword")}
             />
             <button
                 type="button"
@@ -168,8 +182,8 @@ export default function SignUpPage() {
             </button>
             </div>
 
-            {errors.confirm && (
-              <p className="text-xs text-destructive">{errors.confirm.message}</p>
+            {errors.confirmPassword && (
+              <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
             )}
           </div>
 
@@ -185,9 +199,9 @@ export default function SignUpPage() {
           {/* 전화번호 */}
           <div className="space-y-1">
             <Label htmlFor="phone" className="sr-only">전화번호</Label>
-            <Input id="phone" placeholder="전화번호 입력" {...register("phone")} />
-            {errors.phone && (
-              <p className="text-xs text-destructive">{errors.phone.message}</p>
+            <Input id="phone" placeholder="전화번호 입력" {...register("phoneNumber")} />
+            {errors.phoneNumber && (
+              <p className="text-xs text-destructive">{errors.phoneNumber.message}</p>
             )}
           </div>
 

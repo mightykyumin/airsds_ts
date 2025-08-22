@@ -2,7 +2,7 @@ import './App.css'
 import './index.css'
 import "react-day-picker/dist/style.css"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Search } from "lucide-react"
 import type { DateRange } from "react-day-picker"
 
@@ -14,21 +14,33 @@ import { DateRangePicker } from "./components/DateRangePicker/DateRangePicker"
 import { RegionRow } from "./components/Listing/RegionRow"
 import { HostingDialog } from './components/Hosting/HostingDialog'
 import { LoginDialog } from './components/Auth/LoginDialog'
+import { filterByQuery } from "@/lib/utils"
+import { fetchRegionData } from '@/lib/utils'
 
-import { MOCK } from "./data/MOCK"
+
+//import { MOCK } from "./data/MOCK"
+import axios from 'axios'
+import type { RegionData } from './data/types'
 
 export default function App() {
+  /////////////////////// Fetch Data //////////////////////
+  
+  useEffect(() => {
+    fetchRegionData(setRegions, setLoading)
+  }, [])
+
+  //////////////////////// Variables /////////////////////
   const [query, setQuery] = useState("")
   const [range, setRange] = useState<DateRange | undefined>()
+  const [regions, setRegions] = useState<RegionData[]>([])
+  
+  const [loading, setLoading] = useState(true)
   const filtered = useMemo(() => {
-    if (!query.trim()) return MOCK
-    const q = query.toLowerCase()
-    return MOCK.map(r => ({
-      ...r,
-      listings: r.listings.filter(l => l.name.toLowerCase().includes(q) || l.location.toLowerCase().includes(q))
-    })).filter(r => r.listings.length > 0)
-  }, [query])
+  return filterByQuery(regions, query)
+}, [query, regions])
 
+
+  ////////////////////////////////////////////View ///////////////////////////////////////////////////
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
@@ -44,13 +56,13 @@ export default function App() {
 
       <main className="container py-6 space-y-8">
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold">Explore stays</h2>
-          <p className="text-muted-foreground text-sm">Pick your dates and browse by region</p>
+          <h2 className="text-2xl font-semibold">숙소 찾아보기</h2>
+          <p className="text-muted-foreground text-sm">숙소를 검색하고 날짜를 선택하세요</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-w-[1180px]">
           <div className="lg:col-span-6">
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search destination, stay name..." />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="숙소 이름, 주소 검색..." />
           </div>
           <div className="lg:col-span-4">
             <DateRangePicker value={range} onChange={setRange} />
@@ -58,7 +70,7 @@ export default function App() {
           <div className="lg:col-span-2">
             <Button className="w-full">
               <Search className="h-4 w-4 mr-2" />
-              Search
+              숙소 조회
             </Button>
           </div>
         </div>
@@ -69,9 +81,12 @@ export default function App() {
           {filtered.map((r) => (
             <RegionRow key={r.region} data={r} />
           ))}
-          {filtered.length === 0 && <div className="text-muted-foreground">No results</div>}
+          {filtered.length === 0 && <div className="text-muted-foreground">조회 결과 없음</div>}
         </div>
       </main>
     </div>
   )
 }
+
+ 
+
