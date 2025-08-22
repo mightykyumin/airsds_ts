@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select"
 
 export function HostingDialog() {
-  const userId =  Number(sessionStorage.getItem("userId")) || 0
+  const userId =  Number(sessionStorage.getItem("userId")) || 1
   const [ghouseAddress, setGhouseAddress] = useState("")
   const [ghouseLocation, setGhouseLocation] = useState("")
   const [ghousPrice, setGhousPrice] = useState("")
@@ -58,7 +58,7 @@ export function HostingDialog() {
 
 
     try {
-      const res = await axios.post("http://192.168.50.128:8080/ghouse/upload", data)
+      const res = await  axios.post('/ghouse/upload')
       console.log("서버 응답:", res.data)
       alert("숙소 등록 완료!")
       // 필요하면 여기서 상태 초기화 가능
