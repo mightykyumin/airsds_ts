@@ -50,7 +50,7 @@ export function HostingDialog() {
     }
 
     try {
-      const res = await axios.post("http://localhost:8080/api/hostings", data)
+      const res = await axios.post("http://192.168.50.128:8080/ghouse/upload", data)
       console.log("서버 응답:", res.data)
       alert("숙소 등록 완료!")
       // 필요하면 여기서 상태 초기화 가능

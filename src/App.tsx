@@ -14,6 +14,8 @@ import { DateRangePicker } from "./components/DateRangePicker/DateRangePicker"
 import { RegionRow } from "./components/Listing/RegionRow"
 import { HostingDialog } from './components/Hosting/HostingDialog'
 import { LoginDialog } from './components/Auth/LoginDialog'
+import { filterByQuery } from "@/lib/utils"
+import { fetchRegionData } from '@/lib/utils'
 
 import { getRegionData } from './api/regionapi'
 //import { MOCK } from "./data/MOCK"
@@ -22,44 +24,23 @@ import type { RegionData } from './data/types'
 
 export default function App() {
   /////////////////////// Fetch Data //////////////////////
-  // Fetch Region Data
-  async function fetchRegionData() {
-    try {
-      const res = await axios.get('/ghouse')
-      console.log(res.data)
-      
-      setRegions(res.data.regions)
-    } catch (err) {
-      console.error('Failed to fetch region data', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  
   useEffect(() => {
-    fetchRegionData()
+    fetchRegionData(setRegions, setLoading)
   }, [])
 
-  ////////////////////////
+  //////////////////////// Variables /////////////////////
   const [query, setQuery] = useState("")
   const [range, setRange] = useState<DateRange | undefined>()
   const [regions, setRegions] = useState<RegionData[]>([])
   
   const [loading, setLoading] = useState(true)
   const filtered = useMemo(() => {
-    if (!query.trim()) return regions
-    const q = query.toLowerCase()
-    return regions
-      .map(r => ({
-        ...r,
-        listings: r.listings.filter(l =>
-          l.name.toLowerCase().includes(q) ||
-          l.location.toLowerCase().includes(q) ||
-          l.address.toLowerCase().includes(q)
-        )
-      }))
-      .filter(r => r.listings.length > 0)
-  }, [query, regions])
+  return filterByQuery(regions, query)
+}, [query, regions])
 
+
+  ////////////////////////////////////////////View ///////////////////////////////////////////////////
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
