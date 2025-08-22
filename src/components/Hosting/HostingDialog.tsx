@@ -7,8 +7,16 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import type { HostingData } from "@/data/types"
 import axios from "axios"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function HostingDialog() {
+  const userId =  Number(sessionStorage.getItem("userId")) || 0
   const [ghouseAddress, setGhouseAddress] = useState("")
   const [ghouseLocation, setGhouseLocation] = useState("")
   const [ghousPrice, setGhousPrice] = useState("")
@@ -39,12 +47,13 @@ export function HostingDialog() {
       .filter((url) => url.length > 0)
 
     const data: HostingData = {
+      userId,
       address: ghouseAddress,
       location: ghouseLocation,
       price: ghousPrice,
       title: ghouseTitle,
       content: ghouseContent,
-      images: cleanedImages,
+      imageUrl: cleanedImages,
     }
 
 
@@ -81,7 +90,17 @@ export function HostingDialog() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="ghouseLocation">숙소위치</Label>
-            <Input id="ghouseLocation" value={ghouseLocation} onChange={(e) => setGhouseLocation(e.target.value)} placeholder="위치를 입력해주세요 (서울, 제주도, 부산)" />
+            <Select value={ghouseLocation} onValueChange={(value) => setGhouseLocation(value)}>
+              <SelectTrigger id="ghouseLocation" className="w-full">
+                <SelectValue placeholder="지역을 선택해주세요" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Seoul">서울</SelectItem>
+                <SelectItem value="Busan">부산</SelectItem>
+                <SelectItem value="Jeju">제주</SelectItem>
+              </SelectContent>
+            </Select>
+
           </div>
           <div className="space-y-2">
             <Label htmlFor="ghouseAddress">숙소상세위치</Label>
