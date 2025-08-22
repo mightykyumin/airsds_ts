@@ -16,6 +16,7 @@ import { HostingDialog } from './components/Hosting/HostingDialog'
 import { LoginDialog } from './components/Auth/LoginDialog'
 import { filterByQuery } from "@/lib/utils"
 import { fetchRegionData } from '@/lib/utils'
+import { calendarFilterByReservedDates } from "@/lib/utils"
 
 
 //import { MOCK } from "./data/MOCK"
@@ -33,6 +34,7 @@ export default function App() {
   const [query, setQuery] = useState("")
   const [range, setRange] = useState<DateRange | undefined>()
   const [regions, setRegions] = useState<RegionData[]>([])
+  const [filteredResult, setFilteredResult] = useState<RegionData[] | null>(null)
   
   const [loading, setLoading] = useState(true)
   const filtered = useMemo(() => {
@@ -68,7 +70,7 @@ export default function App() {
             <DateRangePicker value={range} onChange={setRange} />
           </div>
           <div className="lg:col-span-2">
-            <Button className="w-full">
+            <Button className="w-full" onClick={() =>calendarFilterByReservedDates(range, filtered, query, setFilteredResult)}>
               <Search className="h-4 w-4 mr-2" />
               숙소 조회
             </Button>
