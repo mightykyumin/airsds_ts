@@ -1,6 +1,3 @@
-console.log("✅ RoomDetailPage 렌더링됨");
-
-
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
