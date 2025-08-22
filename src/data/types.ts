@@ -30,3 +30,43 @@ export type HostingData = {
   content: string
   imageUrl: string[]
 }
+
+// src/data/types.ts
+export type Ghouse = {
+  ghouseId: number
+  userId: number
+  address: string
+  price: number
+  content: string
+  title: string
+  location: string
+  createdAt: string
+}
+
+export type Review = {
+  reviewId: number
+  userId: number
+  ghouseId: number
+  rating: number
+  content: string
+  createdAt: string | null
+}
+
+export type GhouseImage = {
+  imageId: number
+  ghouseId: number
+  imageUrl: string
+}
+
+export type BookingDay = {
+  bookingDayId: number
+  ghouseId: number
+  date: string
+}
+
+export type RoomDetailResponse = {
+  ghouse: Ghouse
+  reviews: Review[]
+  ghouseImages: GhouseImage[]
+  bookingDays: BookingDay[]
+}
