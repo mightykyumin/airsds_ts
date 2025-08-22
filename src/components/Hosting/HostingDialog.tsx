@@ -59,12 +59,13 @@ export function HostingDialog() {
 
 
     try {
-      const res = await axios.post('http://' + endpointIp   + ':8080/ghouse/upload',data)
-      console.log("서버 응답:", res.data.imageUrl)
+      console.log("서버 요청:", data)
+      const res = await axios.post('http://' + endpointIp + ':8080/ghouse/upload',data)
+      console.log("서버 응답:", res.data)
       alert("숙소 등록 완료!")
       // 필요하면 여기서 상태 초기화 가능
       setOpen(false)
-      window.location.reload()
+      // window.location.reload()
     } catch (err) {
       console.error("서버 요청 실패:", err)
       alert("숙소 등록 실패")
