@@ -14,20 +14,20 @@ const passwordRule =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]).{8,16}$/
 
 const schema = z.object({
-  email: z.string().email("올바른 이메일을 입력하세요."),
-  code: z.string().min(4, "인증번호 4자리 이상").max(8, "인증번호가 너무 깁니다."),
+  email: z.string().email("이메일이 존재하지 않습니다"),
+  code: z.string().min(4, "인증번호가 일치하지 않습니다").max(8, "인증번호가 일치하지 않습니다"),
   password: z
     .string()
-    .regex(passwordRule, "8~16자 영문 대/소문자, 숫자, 특수문자를 사용하세요."),
+    .regex(passwordRule, "8~16자 영문 대/소문자, 숫자, 특수문자를 사용하세요"),
   confirm: z.string(),
-  name: z.string().min(2, "이름은 2자 이상"),
+  name: z.string().min(2, "이름은 최소 2자 이상 입력해주세요"),
   phone: z
     .string()
-    .min(9, "전화번호를 입력하세요.")
-    .regex(/^[0-9\-+\s()]+$/, "숫자와 - 만 입력 가능"),
+    .min(9, "전화번호를 입력해주세요")
+    .regex(/^[0-9\-+\s()]+$/, "숫자와 - 만 입력 가능합니다"),
 }).refine(v => v.password === v.confirm, {
   path: ["confirm"],
-  message: "비밀번호가 일치하지 않습니다.",
+  message: "비밀번호가 일치하지 않습니다",
 })
 
 type FormData = z.infer<typeof schema>

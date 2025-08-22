@@ -56,13 +56,13 @@ export default function App() {
 
       <main className="container py-6 space-y-8">
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold">Explore stays</h2>
-          <p className="text-muted-foreground text-sm">Pick your dates and browse by region</p>
+          <h2 className="text-2xl font-semibold">숙소 찾아보기</h2>
+          <p className="text-muted-foreground text-sm">숙소를 검색하고 날짜를 선택하세요</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-w-[1180px]">
           <div className="lg:col-span-6">
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search destination, stay name..." />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="숙소 이름, 주소 검색..." />
           </div>
           <div className="lg:col-span-4">
             <DateRangePicker value={range} onChange={setRange} />
@@ -70,7 +70,7 @@ export default function App() {
           <div className="lg:col-span-2">
             <Button className="w-full">
               <Search className="h-4 w-4 mr-2" />
-              Search
+              숙소 조회
             </Button>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default function App() {
           {filtered.map((r) => (
             <RegionRow key={r.region} data={r} />
           ))}
-          {filtered.length === 0 && <div className="text-muted-foreground">No results</div>}
+          {filtered.length === 0 && <div className="text-muted-foreground">조회 결과 없음</div>}
         </div>
       </main>
     </div>

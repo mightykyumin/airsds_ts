@@ -15,7 +15,7 @@ export function RegionRow({ data }: { data: RegionData }) {
             data.listings.map((l) => <ListingCard key={l.id} item={l} />)
           ) : (
             <div className="flex items-center justify-center text-muted-foreground w-full">
-              No results
+              조회 결과 없음
             </div>
           )}
         </div>

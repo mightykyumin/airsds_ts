@@ -16,26 +16,26 @@ export function LoginDialog() {
       <DialogTrigger asChild>
         <Button variant="default" className="gap-2">
           <LogIn className="h-4 w-4" />
-          Login
+          로그인
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
-          <DialogTitle>Welcome to AIRSDS</DialogTitle>
+          <DialogTitle>AIRSDS</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+            <Label htmlFor="email">이메일</Label>
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="airsds@example.com" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">비밀번호</Label>
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
           </div>
-          <Button className="w-full">Sign in</Button>
-          <div className="text-center text-sm text-muted-foreground">Don’t have an account? 
+          <Button className="w-full">로그인</Button>
+          <div className="text-center text-sm text-muted-foreground">계정이 없으신가요?&nbsp;
            <Link to="/signup" className="underline underline-offset-4">
-            Sign up
+            회원가입
           </Link></div>
         </div>
       </DialogContent>

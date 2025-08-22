@@ -74,13 +74,13 @@ export function HostingDialog() {
       <DialogTrigger asChild>
         <Button variant="outline">
           <Home className="h-4 w-4" />
-          Hosting
+          숙소 등록하기
         </Button>
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
-          <DialogTitle>Host a Place to AIRSDS</DialogTitle>
+          <DialogTitle>숙소를 등록해주세요</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -139,7 +139,7 @@ export function HostingDialog() {
             </Button>
           </div>
 
-          <Button className="w-full" onClick={handleSubmit}>Submit</Button>
+          <Button className="w-full" onClick={handleSubmit}>등록하기</Button>
         </div>
       </DialogContent>
     </Dialog>
