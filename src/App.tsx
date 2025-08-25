@@ -34,7 +34,14 @@ export default function App() {
   const [filteredResult, setFilteredResult] = useState<RegionData[] | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  // 로그인 - localStorage에 저장! (브라우저 단위로 저장)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem("currentUser") ? true : false
+  })
+  const [currentUser, setCurrentUser] = useState<{ userId: number; username: string; email: string } | null>(() => {
+    const saved = localStorage.getItem("currentUser")
+    return saved ? JSON.parse(saved) : null
+  })
 
   // 검색어가 바뀌면 날짜 필터 초기화
   useEffect(() => {
@@ -58,13 +65,16 @@ export default function App() {
             {isLoggedIn ? (
               <>
                 <HostingDialog />
-                <Button variant="default" className="gap-2" onClick={() => setIsLoggedIn(false)}>
+                <Button variant="default" className="gap-2" onClick={() => 
+                  {setIsLoggedIn(false)
+                  setCurrentUser(null)
+                  localStorage.removeItem("currentUser")}}>
                   <LogOut className="h-4 w-4" />
                   로그아웃
                 </Button>
               </>
             ) : (
-              <LoginDialog setIsLoggedIn={setIsLoggedIn} />
+              <LoginDialog setIsLoggedIn={setIsLoggedIn} setCurrentUser={setCurrentUser} />
             )}
           </div>
         </div>

@@ -44,6 +44,16 @@ export default function RoomDetailPage() {
   const { roomId } = useParams<{ roomId: string }>(); // URL param (== ghouseId)
   const navigate = useNavigate();
 
+  //리뷰용 현재 로그인 정보 및 리뷰 작성용 임시 상태
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+  const [newReview, setNewReview] = useState("");
+  const [newRating, setNewRating] = useState(5);
+
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState("");
+  const [editingRating, setEditingRating] = useState(5);
+
   // 상태
   const [room, setRoom] = useState<Ghouse | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -156,6 +166,51 @@ export default function RoomDetailPage() {
           </div>
 
           {/* 리뷰 */}
+          {/* 리뷰 작성 */}
+          <div className="mt-6">
+            {currentUser ? (
+              <div className="space-y-2">
+                <textarea
+                  className="w-full border rounded p-2 text-sm"
+                  placeholder="리뷰를 작성하세요"
+                  value={newReview}
+                  onChange={(e) => setNewReview(e.target.value)}
+                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    max={5}
+                    value={newRating}
+                    onChange={(e) => setNewRating(Number(e.target.value))}
+                    className="w-16 border rounded p-1 text-center"
+                  />
+                  <Button
+                    onClick={async () => {
+                      try {
+                        const res = await axios.post(`http://${endpointIp}:8080/ghouse/review`, {
+                          user_id: currentUser.userId,
+                          ghouse_id: roomId,
+                          rating: newRating,
+                          content: newReview,
+                        });
+                        setReviews([...reviews, { ...res.data, userName: currentUser.username }]);
+                        setNewReview("");
+                        setNewRating(5);
+                      } catch (err) {
+                        console.error("리뷰 작성 실패", err);
+                      }
+                    }}
+                  >
+                    작성
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-400 text-sm">댓글을 작성하려면 로그인하세요</p>
+            )}
+          </div>
+
           <div className="mt-6">
             <h2 className="text-xl font-semibold">리뷰</h2>
             {reviews.length === 0 ? (
@@ -164,10 +219,94 @@ export default function RoomDetailPage() {
               <ul className="mt-2 space-y-2">
                 {reviews.map((rev) => (
                   <li key={rev.reviewId} className="border p-3 rounded-lg text-left">
-                    <div>
-                      ⭐ {rev.rating}점 / <span className="font-bold">{rev.userName}</span>
-                    </div>
-                    <div className="mt-1 text-gray-700 text-sm">{rev.content}</div>
+                    {editingReviewId === rev.reviewId ? (
+                      <>
+                        {/* 수정 모드 */}
+                        <textarea
+                          className="w-full border rounded p-2 text-sm"
+                          value={editingContent}
+                          onChange={(e) => setEditingContent(e.target.value)}
+                        />
+                        <input
+                          type="number"
+                          min={1}
+                          max={5}
+                          value={editingRating}
+                          onChange={(e) => setEditingRating(Number(e.target.value))}
+                          className="w-16 border rounded p-1 text-center mt-1"
+                        />
+                        <div className="flex gap-2 mt-2">
+                          <Button
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                await axios.put(`http://${endpointIp}:8080/ghouse/review`, {
+                                  review_id: rev.reviewId,
+                                  user_id: currentUser.userId,
+                                  ghouse_id: roomId,
+                                  rating: editingRating,
+                                  content: editingContent,
+                                });
+                                setReviews(
+                                  reviews.map((r) =>
+                                    r.reviewId === rev.reviewId
+                                      ? { ...r, content: editingContent, rating: editingRating }
+                                      : r
+                                  )
+                                );
+                                setEditingReviewId(null);
+                              } catch (err) {
+                                console.error("리뷰 수정 실패", err);
+                              }
+                            }}
+                          >
+                            저장
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => setEditingReviewId(null)}>
+                            취소
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          ⭐ {rev.rating}점 / <span className="font-bold">{rev.userName}</span>
+                        </div>
+                        <div className="mt-1 text-gray-700 text-sm">{rev.content}</div>
+
+                        {currentUser && rev.userId === currentUser.userId && (
+                          <div className="flex gap-2 mt-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingReviewId(rev.reviewId);
+                                setEditingContent(rev.content);
+                                setEditingRating(rev.rating);
+                              }}
+                            >
+                              수정
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={async () => {
+                                try {
+                                  await axios.delete(
+                                    `http://${endpointIp}:8080/ghouse/review/${rev.reviewId}`
+                                  );
+                                  setReviews(reviews.filter((r) => r.reviewId !== rev.reviewId));
+                                } catch (err) {
+                                  console.error("리뷰 삭제 실패", err);
+                                }
+                              }}
+                            >
+                              삭제
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>

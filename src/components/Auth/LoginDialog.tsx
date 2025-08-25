@@ -10,7 +10,14 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { endpointIp } from "@/data/Endpoint"
 
-export function LoginDialog({ setIsLoggedIn }: { setIsLoggedIn: (val: boolean) => void }) {
+export function LoginDialog({
+  setIsLoggedIn,
+  setCurrentUser,
+}: {
+  setIsLoggedIn: (val: boolean) => void
+  setCurrentUser: (user: { userId: number; username: string; email: string }) => void
+}) 
+ {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -19,8 +26,9 @@ export function LoginDialog({ setIsLoggedIn }: { setIsLoggedIn: (val: boolean) =
       const res = await axios.post('http://' + endpointIp + ':8080/auth/login', { email, password } )
     
       if (res.status === 200) {
-        // 로그인 정보 저장
+        const user = res.data
         setIsLoggedIn(true)
+        setCurrentUser(user)
       }
     } catch (err) {
       console.error(err)

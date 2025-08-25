@@ -31,7 +31,6 @@ export type HostingData = {
   imageUrl: string[]
 }
 
-// src/data/types.ts
 export type Ghouse = {
   ghouseId: number
   userId: number
