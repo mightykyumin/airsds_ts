@@ -37,6 +37,7 @@ export default function App() {
   const [filteredResult, setFilteredResult] = useState<RegionData[] | null>(null)
   
   const [loading, setLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const filtered = useMemo(() => {
   return filterByQuery(regions, query)
 }, [query, regions])
@@ -50,8 +51,17 @@ export default function App() {
           <div className="text-2xl font-extrabold tracking-tight">AIRSDS</div>
 
           <div className="flex items-center gap-2">
-            <HostingDialog />
-            <LoginDialog />
+            
+            {isLoggedIn ? (
+              <>
+                <HostingDialog />
+                <Button variant="default" onClick={() => setIsLoggedIn(false)}>
+                  로그아웃
+                </Button>
+              </>
+            ) : (
+              <LoginDialog setIsLoggedIn={setIsLoggedIn} />
+            )}
           </div>
         </div>
       </header>
