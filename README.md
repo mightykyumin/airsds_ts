@@ -1,69 +1,88 @@
-# React + TypeScript + Vite
+# 🌐 AIRSDS - Guesthouse Web Application (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-18.0.0-blue?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-frontend-yellow?logo=vite)
+![SpringBoot](https://img.shields.io/badge/SpringBoot-3.x-green?logo=springboot)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-orange?logo=mysql)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-Currently, two official plugins are available:
+> **AIRSDS** is a next-generation guesthouse booking platform inspired by Airbnb,  
+> built with **modern frontend technologies** and connected to a robust Spring Boot backend.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 📖 프로젝트 소개
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**AIRSDS**는 **삼성SDS 신입사원 SW 직무교육** 과정에서 개발한 프로젝트로,  
+Airbnb와 유사한 **게스트하우스 예약 서비스**를 구현했습니다.  
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+이 레포지토리는 **프론트엔드 전용 저장소**이며,  
+빠른 빌드와 개발 경험을 위해 **Vite + React + TypeScript** 스택을 사용하였습니다.  
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+사용자는 직관적인 UI를 통해:
+- 숙소 탐색
+- 숙소 상세 정보 확인
+- 예약 진행  
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+등의 기능을 손쉽게 이용할 수 있습니다.  
+
+---
+
+## 👥 팀 구성 및 역할 분담
+
+| 이름 | 역할 |
+|------|------|
+| **황규민** | 메인 페이지 구현 |
+| **한상안** | 예약 페이지 구현 |
+| **김예랑** | 상세 페이지 구현 |
+
+---
+
+## 🛠️ 기술 스택
+
+### Frontend
+- **Framework**: [React](https://react.dev/) (with Hooks & Component-based architecture)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Bundler/Dev tool**: [Vite](https://vitejs.dev/)  
+- **Styling**: TailwindCSS (optional)  
+
+### Backend
+- **Framework**: [Spring Boot 3.x](https://spring.io/projects/spring-boot)
+- **Language**: Java
+- **ORM**: JPA (Java Persistence API)
+- **Database**: MySQL
+
+---
+
+## ✨ 주요 기능
+
+🔍 숙소 탐색 (Search & Filter)
+사용자가 원하는 지역, 날짜, 가격대 조건으로 숙소 검색 가능
+
+🏠 숙소 상세 정보 (Detail Page)
+사진, 설명, 가격, 위치 정보 제공
+
+📅 예약 기능 (Booking)
+사용자가 원하는 날짜로 예약 가능
+
+📊 데이터 관리
+Spring Boot + JPA 기반으로 안정적 데이터 연동
+
+---
+## 🚀 실행 방법
+### 1. Clone Repository
+```
+git clone https://github.com/mightykyumin/airsds_ts.git
+cd airsds_ts
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Install Dependencies
+```
+npm install
+```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. Run Dev Server
+```
+npm run dev
 ```
