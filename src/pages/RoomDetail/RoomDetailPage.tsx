@@ -205,7 +205,8 @@ export default function RoomDetailPage() {
                   return alert("체크인/체크아웃을 선택하세요.");
                 if (nights <= 0)
                   return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
-                navigate(`/rooms/${room.ghouseId}/reserve-success`);
+                navigate("/booking/complete")
+
               }}
             >
               예약하기
