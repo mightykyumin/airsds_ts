@@ -1,5 +1,5 @@
 // src/pages/SignUpPage.tsx
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -13,11 +13,10 @@ import { endpointIp } from "@/data/Endpoint"
 import axios from 'axios'
 
 const passwordRule =
-  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]).{8,16}$/
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'\",.<>/?\\|`~]).{8,16}$/
 
 const schema = z.object({
   email: z.string().email("이메일이 존재하지 않습니다"),
-  code: z.string().min(4, "인증번호가 일치하지 않습니다").max(8, "인증번호가 일치하지 않습니다"),
   password: z
     .string()
     .regex(passwordRule, "8~16자 영문 대/소문자, 숫자, 특수문자를 사용하세요"),
@@ -38,36 +37,58 @@ export async function registerUser(data: FormData) {
   const res = await axios.post('http://'+ endpointIp + ':8080/auth/signup', data)
   return res.data
 }
+
+export async function checkEmailDuplication(email: string): Promise<boolean> {
+  try {
+    const res = await axios.get(`http://${endpointIp}:8080/auth/signup/checkemail?email=${email}`)
+    return !res.data.exists
+  } catch (err) {
+    console.error("이메일 중복 확인 실패", err)
+    return false
+  }
+}
+
 export default function SignUpPage() {
   const [showPw, setShowPw] = useState(false)
   const [showPw2, setShowPw2] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [verified, setVerified] = useState(false)
+  const [emailChecked, setEmailChecked] = useState(false)
   const navigate = useNavigate()
 
   const {
     register,
     handleSubmit,
-    setValue,
+    getValues,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) })
 
-  
+  const watchedEmail = watch("email")
 
-  const onSendCode = async () => {
-    setSent(true)
-    // TODO: 서버에 이메일 전송 API 호출
-    alert("인증번호를 전송했습니다. (데모)")
-  }
+  useEffect(() => {
+    setEmailChecked(false)
+  }, [watchedEmail])
 
-  const onVerify = async () => {
-    // TODO: 서버에 인증번호 검증 API 호출
-    setVerified(true)
-    alert("인증이 완료되었습니다. (데모)")
+  const onCheckEmail = async () => {
+    const email = getValues("email")
+    if (!email) {
+      alert("이메일을 입력해주세요.")
+      return
+    }
+    const available = await checkEmailDuplication(email)
+    if (!available) {
+      alert("이미 존재하는 이메일입니다.")
+      setEmailChecked(false)
+    } else {
+      alert("사용 가능한 이메일입니다.")
+      setEmailChecked(true)
+    }
   }
 
   const onSubmit = async (data: FormData) => {
-    // TODO: 회원가입 API 연결
+    if (!emailChecked) {
+      alert("이메일 중복 확인을 먼저 해주세요.")
+      return
+    }
     try {
       const res = await registerUser(data)
       console.log('가입 완료', res)
@@ -82,22 +103,13 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex items-start justify-center bg-background">
       <div className="w-full max-w-md px-6 pt-10 pb-16">
-        {/* 로고 */}
         <div className="flex items-center justify-center mb-6">
-            <Link to="/" className="flex items-center gap-2">
-                <img 
-                src="/logo.png"   // 로고 파일 경로 (public 폴더에 logo.png 넣어두면 됨)
-                alt="air sds logo" 
-                className="h-30 w-auto" 
-                />
-            </Link>
-            </div>
-
-
-        
+          <Link to="/" className="flex items-center gap-2">
+            <img src="/logo.png" alt="air sds logo" className="h-30 w-auto" />
+          </Link>
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          {/* 이메일 + 인증 전송 */}
           <div className="grid grid-cols-[1fr_130px] gap-3">
             <div className="space-y-1">
               <Label htmlFor="email" className="sr-only">이메일</Label>
@@ -111,49 +123,29 @@ export default function SignUpPage() {
                 <p className="text-xs text-destructive">{errors.email.message}</p>
               )}
             </div>
-            <Button type="button" variant="secondary" onClick={onSendCode}>
-              {sent ? "재전송" : "인증번호 전송"}
+            <Button type="button" variant="secondary" onClick={onCheckEmail}>
+              {emailChecked ? "확인됨" : "중복체크"}
             </Button>
           </div>
 
-          {/* 인증번호 + 확인 */}
-          <div className="grid grid-cols-[1fr_130px] gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="code" className="sr-only">인증번호</Label>
-              <Input
-                id="code"
-                placeholder="인증번호 입력"
-                {...register("code")}
-              />
-              {errors.code && (
-                <p className="text-xs text-destructive">{errors.code.message}</p>
-              )}
-            </div>
-            <Button type="button" variant={verified ? "default" : "secondary"} onClick={onVerify}>
-              {verified ? "확인됨" : "인증번호 확인"}
-            </Button>
-          </div>
-
-          {/* 비밀번호 */}
           <div className="space-y-1">
             <Label htmlFor="password" className="sr-only">비밀번호</Label>
             <div className="relative">
-                <Input
-                    id="password"
-                    type={showPw ? "text" : "password"}
-                    placeholder="비밀번호 입력"
-                    {...register("password")}
-                />
-                <button
-                    type="button"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground"
-                    onClick={() => setShowPw((p) => !p)}
-                    aria-label={showPw ? "비밀번호 숨기기" : "비밀번호 보기"}
-                >
-                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-                </div>
-
+              <Input
+                id="password"
+                type={showPw ? "text" : "password"}
+                placeholder="비밀번호 입력"
+                {...register("password")}
+              />
+              <button
+                type="button"
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground"
+                onClick={() => setShowPw((p) => !p)}
+                aria-label={showPw ? "비밀번호 숨기기" : "비밀번호 보기"}
+              >
+                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             <p className="text-[11px] text-muted-foreground">
               8~16자 영문 대/소문자, 숫자, 특수문자를 사용하세요
             </p>
@@ -162,32 +154,29 @@ export default function SignUpPage() {
             )}
           </div>
 
-          {/* 비밀번호 재확인 */}
           <div className="space-y-1">
             <Label htmlFor="confirm" className="sr-only">비밀번호 재확인</Label>
-           <div className="relative">
-            <Input
+            <div className="relative">
+              <Input
                 id="confirm"
                 type={showPw2 ? "text" : "password"}
                 placeholder="비밀번호 재확인"
                 {...register("confirmPassword")}
-            />
-            <button
+              />
+              <button
                 type="button"
                 className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground"
                 onClick={() => setShowPw2((p) => !p)}
                 aria-label={showPw2 ? "비밀번호 숨기기" : "비밀번호 보기"}
-            >
+              >
                 {showPw2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
+              </button>
             </div>
-
             {errors.confirmPassword && (
               <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
             )}
           </div>
 
-          {/* 이름 */}
           <div className="space-y-1">
             <Label htmlFor="name" className="sr-only">이름</Label>
             <Input id="name" placeholder="이름 입력" {...register("name")} />
@@ -196,7 +185,6 @@ export default function SignUpPage() {
             )}
           </div>
 
-          {/* 전화번호 */}
           <div className="space-y-1">
             <Label htmlFor="phone" className="sr-only">전화번호</Label>
             <Input id="phone" placeholder="전화번호 입력" {...register("phoneNumber")} />
@@ -205,7 +193,6 @@ export default function SignUpPage() {
             )}
           </div>
 
-          {/* 생성 버튼 */}
           <Button type="submit" className="w-full mt-2" disabled={isSubmitting}>
             생성
           </Button>
