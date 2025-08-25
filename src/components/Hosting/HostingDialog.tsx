@@ -152,15 +152,3 @@ export function HostingDialog() {
     </Dialog>
   )
 }
-
-function DialogButton({ className, ...props }: React.ComponentProps<'button'>) {
-  return (
-    <button
-      className={cn(
-        "text-lg leading-none font-semibold px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600",
-        className
-      )}
-      {...props}
-    />
-  )
-}
