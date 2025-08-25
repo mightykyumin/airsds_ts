@@ -131,8 +131,12 @@ export function HostingDialog() {
                   placeholder={`이미지 URL ${index + 1}`}
                 />
                 {ghouseImages.length > 1 && (
-                  <Button variant="destructive" onClick={() => removeImageField(index)}>
-                    X
+                  <Button
+                    variant="destructive"
+                    className="text-[0px] leading-none font-semibold px-1 py-0.5 rounded bg-blue-500 text-black hover:bg-blue-600"
+                    onClick={() => removeImageField(index)}
+                  >
+                    ×
                   </Button>
                 )}
               </div>
@@ -146,5 +150,17 @@ export function HostingDialog() {
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function DialogButton({ className, ...props }: React.ComponentProps<'button'>) {
+  return (
+    <button
+      className={cn(
+        "text-lg leading-none font-semibold px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600",
+        className
+      )}
+      {...props}
+    />
   )
 }
