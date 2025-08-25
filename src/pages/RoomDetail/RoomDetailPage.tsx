@@ -68,7 +68,12 @@ export default function RoomDetailPage() {
       console.log("ghouse 응답:", res.data);
 
       setRoom(res.data.ghouse);
-      setReviews(res.data.reviews);
+      setReviews(
+      res.data.reviews.map((r: any) => ({
+        ...r.review,
+        userName: r.userName,
+      }))
+      );
       setImages(res.data.ghouseImages);
       setBookingDays(res.data.bookingDays);
     } catch (err) {
@@ -158,8 +163,11 @@ export default function RoomDetailPage() {
             ) : (
               <ul className="mt-2 space-y-2">
                 {reviews.map((rev) => (
-                  <li key={rev.reviewId} className="border p-3 rounded-lg text-sm">
-                    ⭐ {rev.rating}점 · {rev.content}
+                  <li key={rev.reviewId} className="border p-3 rounded-lg text-left">
+                    <div>
+                      ⭐ {rev.rating}점 / <span className="font-bold">{rev.userName}</span>
+                    </div>
+                    <div className="mt-1 text-gray-700 text-sm">{rev.content}</div>
                   </li>
                 ))}
               </ul>
