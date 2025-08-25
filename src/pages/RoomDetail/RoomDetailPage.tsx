@@ -275,7 +275,7 @@ function GalleryModal({
             {index + 1} / {images.length}
           </span>
           <button className="p-2 rounded hover:bg-white/10" onClick={onClose} aria-label="닫기">
-            <X />
+            <X className="text-black"/>
           </button>
         </div>
 
