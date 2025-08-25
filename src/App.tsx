@@ -18,14 +18,11 @@ import { filterByQuery } from "@/lib/utils"
 import { fetchRegionData } from '@/lib/utils'
 import { calendarFilterByReservedDates } from "@/lib/utils"
 
-
-//import { MOCK } from "./data/MOCK"
 import axios from 'axios'
 import type { RegionData } from './data/types'
 
 export default function App() {
   /////////////////////// Fetch Data //////////////////////
-  
   useEffect(() => {
     fetchRegionData(setRegions, setLoading)
   }, [])
@@ -35,12 +32,18 @@ export default function App() {
   const [range, setRange] = useState<DateRange | undefined>()
   const [regions, setRegions] = useState<RegionData[]>([])
   const [filteredResult, setFilteredResult] = useState<RegionData[] | null>(null)
-  
   const [loading, setLoading] = useState(true)
-  const filtered = useMemo(() => {
-  return filterByQuery(regions, query)
-}, [query, regions])
 
+  // 검색어가 바뀌면 날짜 필터 초기화
+  useEffect(() => {
+    setFilteredResult(null)
+  }, [query])
+
+  // 최종 보여줄 필터 결과
+  const filtered = useMemo(() => {
+    const base = filteredResult ?? regions
+    return filterByQuery(base, query)
+  }, [query, regions, filteredResult])
 
   ////////////////////////////////////////////View ///////////////////////////////////////////////////
   return (
@@ -48,7 +51,6 @@ export default function App() {
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
         <div className="container py-4 flex items-center justify-between gap-4">
           <div className="text-2xl font-extrabold tracking-tight">AIRSDS</div>
-
           <div className="flex items-center gap-2">
             <HostingDialog />
             <LoginDialog />
@@ -64,13 +66,20 @@ export default function App() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-w-[1180px]">
           <div className="lg:col-span-6">
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="숙소 이름, 주소 검색..." />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="숙소 이름, 주소 검색..."
+            />
           </div>
           <div className="lg:col-span-4">
             <DateRangePicker value={range} onChange={setRange} />
           </div>
           <div className="lg:col-span-2">
-            <Button className="w-full" onClick={() =>calendarFilterByReservedDates(range, filtered, query, setFilteredResult)}>
+            <Button
+              className="w-full"
+              onClick={() => calendarFilterByReservedDates(range, regions, query, setFilteredResult)}
+            >
               <Search className="h-4 w-4 mr-2" />
               숙소 조회
             </Button>
@@ -83,12 +92,11 @@ export default function App() {
           {filtered.map((r) => (
             <RegionRow key={r.region} data={r} />
           ))}
-          {filtered.length === 0 && <div className="text-muted-foreground">조회 결과 없음</div>}
+          {filtered.length === 0 && (
+            <div className="text-muted-foreground">조회 결과 없음</div>
+          )}
         </div>
       </main>
     </div>
   )
 }
-
- 
-
