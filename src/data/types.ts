@@ -50,6 +50,7 @@ export type Review = {
   rating: number
   content: string
   createdAt: string | null
+  userName?: string
 }
 
 export type GhouseImage = {
