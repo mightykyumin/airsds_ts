@@ -34,7 +34,39 @@ export default function App() {
   const [filteredResult, setFilteredResult] = useState<RegionData[] | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  // 로그인 - localStorage에 저장! (브라우저 단위로 저장)
+  const [userId, setUserId] = useState<number | null>(() => {
+    const saved = localStorage.getItem("userId");
+    const parsed = Number(saved);
+    return !saved || isNaN(parsed) || parsed === 0 ? null : parsed;
+  });
+
+  const [username, setUsername] = useState<string | null>(() => {
+    const saved = localStorage.getItem("username");
+    return saved ?? null;
+  });
+
+  const [email, setEmail] = useState<string | null>(() => {
+    const saved = localStorage.getItem("email");
+    return saved ?? null;
+  });
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => userId !== null);
+
+  useEffect(() => {
+    setIsLoggedIn(userId !== null);
+
+    if (userId) {
+      const savedUsername = localStorage.getItem("username");
+      const savedEmail = localStorage.getItem("email");
+
+      setUsername(savedUsername ?? null);
+      setEmail(savedEmail ?? null);
+    } else {
+      setUsername(null);
+      setEmail(null);
+    }
+  }, [userId]);
 
   // 검색어가 바뀌면 날짜 필터 초기화
   useEffect(() => {
@@ -58,7 +90,18 @@ export default function App() {
             {isLoggedIn ? (
               <>
                 <HostingDialog />
-                <Button variant="default" className="gap-2" onClick={() => setIsLoggedIn(false)}>
+                <Button variant="default" className="gap-2" 
+                  onClick={() => 
+                    {
+                      setIsLoggedIn(false);
+                      setUserId(null);
+                      setUsername(null);
+                      setEmail(null);
+                      localStorage.removeItem("userId");
+                      localStorage.removeItem("username");
+                      localStorage.removeItem("email");
+                    }
+                  }>
                   <LogOut className="h-4 w-4" />
                   로그아웃
                 </Button>
