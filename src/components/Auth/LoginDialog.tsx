@@ -12,10 +12,8 @@ import { endpointIp } from "@/data/Endpoint"
 
 export function LoginDialog({
   setIsLoggedIn,
-  setCurrentUser,
 }: {
   setIsLoggedIn: (val: boolean) => void
-  setCurrentUser: (user: { userId: number; username: string; email: string }) => void
 }) 
  {
   const [email, setEmail] = useState("")
@@ -26,9 +24,13 @@ export function LoginDialog({
       const res = await axios.post('http://' + endpointIp + ':8080/auth/login', { email, password } )
     
       if (res.status === 200) {
-        const user = res.data
-        setIsLoggedIn(true)
-        setCurrentUser(user)
+        const user = res.data;
+
+        setIsLoggedIn(true);
+
+        localStorage.setItem("userId", String(user.id));
+        localStorage.setItem("username", user.name);
+        localStorage.setItem("email", user.email);
       }
     } catch (err) {
       console.error(err)

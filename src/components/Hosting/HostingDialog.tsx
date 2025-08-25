@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select"
 
 export function HostingDialog() {
-  const userId =  Number(sessionStorage.getItem("userId")) || 1
+  const userId =  Number(localStorage.getItem("userId"))
   const [ghouseAddress, setGhouseAddress] = useState("")
   const [ghouseLocation, setGhouseLocation] = useState("")
   const [ghousPrice, setGhousPrice] = useState("")
