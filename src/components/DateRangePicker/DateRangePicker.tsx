@@ -13,7 +13,8 @@ export function DateRangePicker({
   value,
   onChange,
   placeholder = "체크인 날짜 — 체크아웃 날짜",
-  className
+  className,
+  disabledDays = [],
 }: Props) {
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<DateRange | undefined>(value)
@@ -96,7 +97,7 @@ export function DateRangePicker({
             weekStartsOn={1}
             defaultMonth={draft?.from ?? value?.from ?? today}
             fromMonth={today}
-            disabled={{ before: today }}
+            disabled={[{ before: today }, ...disabledDays]}
             modifiersStyles={{
               disabled: { opacity: 0.45, cursor: "not-allowed", textDecoration: "line-through" }
             }}

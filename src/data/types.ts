@@ -5,6 +5,7 @@ export type Props = {
   onChange: (v: DateRange | undefined) => void
   placeholder?: string
   className?: string
+  disabledDays?: Date[]
 }
 
 export type Listing = {
