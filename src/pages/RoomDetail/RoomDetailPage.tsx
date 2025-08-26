@@ -334,6 +334,7 @@ export default function RoomDetailPage() {
                 value={range}
                 onChange={setRange}
                 className="w-full"
+                disabledDays={bookingDays.map(b => new Date(b.date))}
               />
             </div>
 
