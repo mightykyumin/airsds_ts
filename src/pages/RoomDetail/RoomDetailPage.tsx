@@ -14,6 +14,7 @@ import type {
   GhouseImage,
   BookingDay,
 } from "@/data/types";
+import { format } from "date-fns";
 
 /* calender size 조정용 */
 function useMedia(query: string) {
@@ -378,13 +379,25 @@ export default function RoomDetailPage() {
 
             <Button
               className="mt-4 w-full bg-primary text-black px-6 py-3 rounded-xl hover:bg-primary/90"
-              onClick={() => {
+              onClick={async () => {
                 if (!range?.from || !range.to)
                   return alert("체크인/체크아웃을 선택하세요.");
                 if (nights <= 0)
                   return alert("체크아웃은 체크인 이후 날짜여야 합니다.");
-                navigate("/booking/complete")
 
+                try {
+                  await axios.post(`http://${endpointIp}:8080/ghouse/booking`, {
+                    userId: userId,
+                    ghouseId: roomId,
+                    checkInDate: format(range.from, "yyyy-MM-dd"),
+                    checkOutDate: format(range.to, "yyyy-MM-dd"),
+                    phoneNumber: ""
+                  });
+                  navigate("/booking/complete");
+                } catch (err) {
+                  console.error("예약 실패", err);
+                  alert("예약 요청에 실패했습니다.");
+                }
               }}
             >
               예약하기
