@@ -45,7 +45,39 @@ export default function RoomDetailPage() {
   const navigate = useNavigate();
 
   //리뷰용 현재 로그인 정보 및 리뷰 작성용 임시 상태
-  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+// 로그인 - localStorage에 저장! (브라우저 단위로 저장)
+  const [userId, setUserId] = useState<number | null>(() => {
+    const saved = localStorage.getItem("userId");
+    const parsed = Number(saved);
+    return !saved || isNaN(parsed) || parsed === 0 ? null : parsed;
+  });
+
+  const [username, setUsername] = useState<string | null>(() => {
+    const saved = localStorage.getItem("username");
+    return saved ?? null;
+  });
+
+  const [email, setEmail] = useState<string | null>(() => {
+    const saved = localStorage.getItem("email");
+    return saved ?? null;
+  });
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => userId !== null);
+
+  useEffect(() => {
+    setIsLoggedIn(userId !== null);
+
+    if (userId) {
+      const savedUsername = localStorage.getItem("username");
+      const savedEmail = localStorage.getItem("email");
+
+      setUsername(savedUsername ?? null);
+      setEmail(savedEmail ?? null);
+    } else {
+      setUsername(null);
+      setEmail(null);
+    }
+  }, [userId]);
 
   const [newReview, setNewReview] = useState("");
   const [newRating, setNewRating] = useState(5);
@@ -168,7 +200,7 @@ export default function RoomDetailPage() {
           {/* 리뷰 */}
           {/* 리뷰 작성 */}
           <div className="mt-6">
-            {currentUser ? (
+            {isLoggedIn ? (
               <div className="space-y-2">
                 <textarea
                   className="w-full border rounded p-2 text-sm"
@@ -189,12 +221,12 @@ export default function RoomDetailPage() {
                     onClick={async () => {
                       try {
                         const res = await axios.post(`http://${endpointIp}:8080/ghouse/review`, {
-                          user_id: currentUser.userId,
-                          ghouse_id: roomId,
+                          userId: userId,
+                          ghouseId: roomId,
                           rating: newRating,
                           content: newReview,
                         });
-                        setReviews([...reviews, { ...res.data, userName: currentUser.username }]);
+                        setReviews([...reviews, { ...res.data, userName: username }]);
                         setNewReview("");
                         setNewRating(5);
                       } catch (err) {
@@ -240,13 +272,17 @@ export default function RoomDetailPage() {
                             size="sm"
                             onClick={async () => {
                               try {
-                                await axios.put(`http://${endpointIp}:8080/ghouse/review`, {
-                                  review_id: rev.reviewId,
-                                  user_id: currentUser.userId,
-                                  ghouse_id: roomId,
-                                  rating: editingRating,
-                                  content: editingContent,
-                                });
+                                await axios.patch(
+                                  `http://${endpointIp}:8080/ghouse/review`, 
+                                  {
+                                    reviewId: rev.reviewId,
+                                    userId: userId,
+                                    ghouseId: roomId,
+                                    rating: editingRating,
+                                    content: editingContent,
+                                  }
+                                );
+
                                 setReviews(
                                   reviews.map((r) =>
                                     r.reviewId === rev.reviewId
@@ -274,7 +310,7 @@ export default function RoomDetailPage() {
                         </div>
                         <div className="mt-1 text-gray-700 text-sm">{rev.content}</div>
 
-                        {currentUser && rev.userId === currentUser.userId && (
+                        {userId && rev.userId === userId && (
                           <div className="flex gap-2 mt-2">
                             <Button
                               size="sm"
@@ -290,6 +326,7 @@ export default function RoomDetailPage() {
                             <Button
                               size="sm"
                               variant="destructive"
+                              className="text-black"
                               onClick={async () => {
                                 try {
                                   await axios.delete(
