@@ -47,6 +47,19 @@ export function HostingDialog() {
       .map((url) => url.trim())
       .filter((url) => url.length > 0)
 
+    // 2. 필수 입력값 검사
+  if (
+    !ghouseTitle.trim() ||
+    !ghouseLocation.trim() ||
+    !ghouseAddress.trim() ||
+    !ghousPrice.trim() ||
+    !ghouseContent.trim() ||
+    cleanedImages.length === 0
+  ) {
+    alert("모든 필수 항목을 입력해주세요.")
+    return
+  }
+
     const data: HostingData = {
       userId,
       address: ghouseAddress,
