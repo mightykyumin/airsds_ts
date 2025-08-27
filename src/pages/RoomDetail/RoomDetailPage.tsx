@@ -314,6 +314,7 @@ export default function RoomDetailPage() {
 
                         {userId && rev.userId === userId && (
                           <div className="flex gap-2 mt-2">
+                            <span className="text-lg">⭐</span>
                             <Button
                               size="sm"
                               variant="outline"
