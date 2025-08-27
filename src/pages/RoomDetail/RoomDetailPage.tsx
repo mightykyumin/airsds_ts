@@ -209,6 +209,7 @@ export default function RoomDetailPage() {
                   onChange={(e) => setNewReview(e.target.value)}
                 />
                 <div className="flex items-center gap-2">
+                  <span className="text-lg">⭐</span>
                   <input
                     type="number"
                     min={1}
