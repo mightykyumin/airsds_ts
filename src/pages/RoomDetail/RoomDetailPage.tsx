@@ -261,6 +261,7 @@ export default function RoomDetailPage() {
                           value={editingContent}
                           onChange={(e) => setEditingContent(e.target.value)}
                         />
+                        <span className="text-lg">⭐</span>
                         <input
                           type="number"
                           min={1}
@@ -314,7 +315,6 @@ export default function RoomDetailPage() {
 
                         {userId && rev.userId === userId && (
                           <div className="flex gap-2 mt-2">
-                            <span className="text-lg">⭐</span>
                             <Button
                               size="sm"
                               variant="outline"
