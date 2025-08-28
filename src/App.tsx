@@ -5,6 +5,7 @@ import "react-day-picker/dist/style.css"
 import { useEffect, useMemo, useState } from "react"
 import { LogOut, Search } from "lucide-react"
 import type { DateRange } from "react-day-picker"
+import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -81,37 +82,45 @@ export default function App() {
 
   ////////////////////////////////////////////View ///////////////////////////////////////////////////
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
-        <div className="container py-4 flex items-center justify-between gap-4">
-          <div className="text-2xl font-extrabold tracking-tight">AIRSDS</div>
-          <div className="flex items-center gap-2">
-            
-            {isLoggedIn ? (
-              <>
-                <HostingDialog />
-                <Button variant="default" className="gap-2" 
-                  onClick={() => 
-                    {
-                      setIsLoggedIn(false);
-                      setUserId(null);
-                      setUsername(null);
-                      setEmail(null);
-                      localStorage.removeItem("userId");
-                      localStorage.removeItem("username");
-                      localStorage.removeItem("email");
-                    }
-                  }>
-                  <LogOut className="h-4 w-4" />
-                  로그아웃
-                </Button>
-              </>
-            ) : (
-              <LoginDialog setIsLoggedIn={setIsLoggedIn} />
-            )}
-          </div>
+  <div className="min-h-screen">
+    <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
+      <div className="container py-4 flex items-center justify-between gap-4">
+        <Link to="/" className="flex items-center gap-2">
+          <img
+            src="../public/logo.png"
+            alt="AIRSDS Logo"
+            className="h-25 w-auto"
+          />
+        </Link>
+
+        <div className="flex items-center gap-2">
+          {isLoggedIn ? (
+            <>
+              <HostingDialog />
+              <Button
+                variant="default"
+                className="gap-2"
+                onClick={() => {
+                  setIsLoggedIn(false)
+                  setUserId(null)
+                  setUsername(null)
+                  setEmail(null)
+                  localStorage.removeItem("userId")
+                  localStorage.removeItem("username")
+                  localStorage.removeItem("email")
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                로그아웃
+              </Button>
+            </>
+          ) : (
+            <LoginDialog setIsLoggedIn={setIsLoggedIn} />
+          )}
         </div>
-      </header>
+      </div>
+    </header>
+
 
       <main className="container py-6 space-y-8">
         <div className="space-y-2">
