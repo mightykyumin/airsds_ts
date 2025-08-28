@@ -42,7 +42,7 @@
 
 ### Frontend
 - **Framework**: [React 19](https://react.dev/)  
-- **Language**: JavaScript (추후 TypeScript로 확장 가능)  
+- **Language**: TypeScript
 - **Build Tool**: [Create React App (CRA)](https://create-react-app.dev/)  
 - **HTTP Client**: [Axios](https://axios-http.com/)  
 - **Testing**: [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), Jest  
