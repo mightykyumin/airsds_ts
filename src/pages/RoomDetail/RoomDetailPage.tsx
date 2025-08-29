@@ -401,8 +401,14 @@ export default function RoomDetailPage() {
             </div>
 
             <Button
-              className="mt-4 w-full bg-primary text-black px-6 py-3 rounded-xl hover:bg-primary/90"
+              className={`mt-4 w-full px-6 py-3 rounded-xl 
+                ${userId === null 
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                  : "bg-primary text-black hover:bg-primary/90"}`}
+              disabled={userId === null}
               onClick={async () => {
+                if (userId === null) return;
+                
                 if (!range?.from || !range.to)
                   return alert("체크인/체크아웃을 선택하세요.");
                 if (nights <= 0)
