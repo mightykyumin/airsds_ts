@@ -372,7 +372,29 @@ export default function RoomDetailPage() {
             <div className="mt-4">
               <DateRangePicker
                 value={range}
-                onChange={setRange}
+                
+                onChange={(nextRange) => {
+                  if (!nextRange?.from || !nextRange?.to) {
+                    setRange(nextRange);
+                    return;
+                  }
+
+                  // 선택한 범위 안에 예약된 날짜가 포함되어 있는지 검사
+                  const hasBlocked = bookingDays
+                    .map(b => new Date(b.date))
+                    .some(disabled => {
+                      return disabled >= nextRange.from! && disabled <= nextRange.to!;
+                    });
+
+                  if (hasBlocked) {
+                    alert("선택한 기간에 이미 예약된 날짜가 포함되어 있습니다.");
+                    setRange(undefined); // 선택 취소
+                    return;
+                  }
+
+                  setRange(nextRange); // 정상 범위만 반영
+                }}
+
                 className="w-full"
                 disabledDays={bookingDays.map(b => new Date(b.date))}
               />
