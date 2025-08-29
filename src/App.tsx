@@ -85,7 +85,13 @@ export default function App() {
   <div className="min-h-screen">
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
       <div className="container py-4 flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2">
+        <Link 
+          to="/"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = "/";
+          }} 
+          className="flex items-center gap-2">
           <img
             src="../public/logo.png"
             alt="AIRSDS Logo"
@@ -128,7 +134,7 @@ export default function App() {
           <p className="text-muted-foreground text-sm">숙소를 검색하고 날짜를 선택하세요</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-w-[1180px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-w-[1220px]">
           <div className="lg:col-span-6">
             <Input
               value={query}
