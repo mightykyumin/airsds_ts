@@ -111,9 +111,9 @@ export function HostingDialog() {
                 <SelectValue placeholder="지역을 선택해주세요" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Seoul">서울</SelectItem>
-                <SelectItem value="Busan">부산</SelectItem>
-                <SelectItem value="Jeju">제주</SelectItem>
+                <SelectItem value="서울">서울</SelectItem>
+                <SelectItem value="부산">부산</SelectItem>
+                <SelectItem value="제주">제주</SelectItem>
               </SelectContent>
             </Select>
 
